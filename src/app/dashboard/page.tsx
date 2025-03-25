@@ -28,6 +28,7 @@ import { useToast } from "@/hooks/use-toast";
 import { IndexingJob } from "@/lib/types";
 import { AlertCircle, CheckCircle2, Loader2 } from "lucide-react";
 import { Sidebar } from "@/components/Sidebar";
+import { getLoggedInUser } from "@/lib/supabaseAdmin";
 
 const formSchema = z.object({
   dbHost: z.string().min(1, "Database host is required"),
@@ -61,7 +62,9 @@ export default function Dashboard() {
 
   useEffect(() => {
     const getUser = async () => {
-      const { data } = await supabase.auth.getUser();
+      const { data } = await getLoggedInUser();
+
+      console.log(data);
       
       if (data?.user) {
         setUser(data.user);
@@ -69,6 +72,7 @@ export default function Dashboard() {
         const interval = setInterval(fetchActiveJobs, 5000);
         return () => clearInterval(interval);
       } else {
+        alert("You are not logged in, please sign in to continue.");
         window.location.href = "/auth";
       }
     };
@@ -138,7 +142,6 @@ export default function Dashboard() {
       toast({
         title: "Error",
         description: error.message,
-        variant: "destructive",
       });
     }
   }

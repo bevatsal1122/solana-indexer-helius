@@ -4,9 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
-import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
+import { signUpUser, signInUser } from "@/lib/supabaseAdmin";
 
 export default function Auth() {
   const [email, setEmail] = useState("");
@@ -19,22 +19,20 @@ export default function Auth() {
     e.preventDefault();
     try {
       setLoading(true);
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-      });
+      const response = await signUpUser(email, password);
 
-      if (error) throw error;
+      if (!response.success) {
+        throw new Error(response.error);
+      }
 
       toast({
-        title: "Success!",
-        description: "Account created successfully. You can now sign in.",
+        title: "Account created successfully, you can now sign in.",
+        theme: "light",
       });
     } catch (error: any) {
       toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
+        title: error.message,
+        theme: "light",
       });
     } finally {
       setLoading(false);
@@ -45,19 +43,18 @@ export default function Auth() {
     e.preventDefault();
     try {
       setLoading(true);
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
+      const response = await signInUser(email, password);
 
-      if (error) throw error;
+      if (!response.success) {
+        throw new Error(response.error);
+      }
 
       router.push("/dashboard");
     } catch (error: any) {
+      console.log("at frontend", error);
       toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
+        title: error.message,
+        theme: "light",
       });
     } finally {
       setLoading(false);
@@ -67,34 +64,41 @@ export default function Auth() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-background to-secondary p-4">
       <Card className="w-full max-w-md p-8">
-        <h2 className="text-2xl font-bold text-center mb-8">Welcome to Blockchain Indexer</h2>
+        <h2 className="text-2xl font-bold text-center mb-4">
+          Solana Indexer | By bevatsal1122
+        </h2>
         <form className="space-y-4">
-          <div>
-            <Input
-              type="email"
-              placeholder="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
+          <div className="mb-10 space-y-4">
+            <div className="space-y-2">
+              <Input
+                type="email"
+                placeholder="Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="h-10"
+              />
+            </div>
+            <div>
+              <Input
+                type="password"
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="h-10"
+              />
+            </div>
           </div>
-          <div>
-            <Input
-              type="password"
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-          </div>
+
           <div className="space-y-2">
             <Button
-              className="w-full"
+              className="w-full h-10"
               onClick={handleSignIn}
               disabled={loading}
             >
               Sign In
             </Button>
             <Button
-              className="w-full"
+              className="w-full h-10"
               variant="outline"
               onClick={handleSignUp}
               disabled={loading}
