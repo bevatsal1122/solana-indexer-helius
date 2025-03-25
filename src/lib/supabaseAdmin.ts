@@ -119,8 +119,6 @@ export async function getLoggedInUser(): Promise<AuthResponse> {
       {
         auth_id: data.user.id,
         email_id: data.user.email,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
       },
       {
         onConflict: "auth_id",

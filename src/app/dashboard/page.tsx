@@ -54,13 +54,6 @@ export default function Dashboard() {
   });
 
   useEffect(() => {
-    fetchActiveJobs();
-    const interval = setInterval(fetchActiveJobs, 5000);
-    return () => clearInterval(interval);
-  }, []);
-
-
-  useEffect(() => {
     const getUser = async () => {
       const { data } = await getLoggedInUser();
 
