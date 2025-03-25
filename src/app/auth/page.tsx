@@ -3,10 +3,10 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
-import { signUpUser, signInUser } from "@/lib/supabaseAdmin";
+import { signUpUser, signInUser, getLoggedInUser } from "@/lib/supabaseAdmin";
 
 export default function Auth() {
   const [email, setEmail] = useState("");
@@ -14,6 +14,18 @@ export default function Auth() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
+
+  useEffect(() => {
+    const getUser = async () => {
+      const { data } = await getLoggedInUser();
+
+      if (data?.user) {
+        router.push("/dashboard");
+      }
+    };
+
+    getUser();
+  }, []);
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -2,16 +2,16 @@
 
 import { createClient } from "@supabase/supabase-js";
 import { AuthResponse } from "./types";
-
+import { Database } from "./database.types";
 if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
   throw new Error("Missing env.NEXT_PUBLIC_SUPABASE_URL");
 }
 
 if (!process.env.SUPABASE_SERVICE_KEY) {
-  throw new Error("Missing env.NEXT_PUBLIC_SUPABASE_ANON_KEY");
+  throw new Error("Missing env.SUPABASE_SERVICE_KEY");
 }
 
-const supabaseAdmin = createClient(
+const supabaseAdmin = createClient<Database>(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
   process.env.SUPABASE_SERVICE_KEY
 );
@@ -106,11 +106,29 @@ export async function getLoggedInUser(): Promise<AuthResponse> {
   try {
     const { data, error } = await supabaseAdmin.auth.getUser();
 
-    console.log(data);
-    console.log(error);
-
     if (error) {
       throw new Error(error.message);
+    }
+
+    if (!data.user) {
+      throw new Error("User not found");
+    }
+
+    // Store user details in users table
+    const { error: upsertError } = await supabaseAdmin.from("users").upsert(
+      {
+        auth_id: data.user.id,
+        email_id: data.user.email,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      },
+      {
+        onConflict: "auth_id",
+      }
+    );
+
+    if (upsertError) {
+      console.error("Error updating users table:", upsertError);
     }
 
     return {
@@ -123,6 +141,25 @@ export async function getLoggedInUser(): Promise<AuthResponse> {
       error:
         error.message.charAt(0).toUpperCase() +
         error.message.slice(1).replace("_", " "),
+    };
+  }
+}
+
+export async function signOutUser() {
+  try {
+    const { error } = await supabaseAdmin.auth.signOut();
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    return {
+      success: true,
+    };
+  } catch (error: any) {
+    return {
+      success: false,
+      error: error.message,
     };
   }
 }

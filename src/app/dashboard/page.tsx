@@ -64,15 +64,12 @@ export default function Dashboard() {
     const getUser = async () => {
       const { data } = await getLoggedInUser();
 
-      console.log(data);
-      
       if (data?.user) {
         setUser(data.user);
         fetchActiveJobs();
         const interval = setInterval(fetchActiveJobs, 5000);
         return () => clearInterval(interval);
       } else {
-        alert("You are not logged in, please sign in to continue.");
         window.location.href = "/auth";
       }
     };
@@ -89,7 +86,7 @@ export default function Dashboard() {
         .limit(5);
 
       if (error) throw error;
-      setActiveJobs(jobs);
+    //   setActiveJobs(jobs);
     } catch (error: any) {
       console.error('Error fetching jobs:', error);
     } finally {
@@ -99,39 +96,6 @@ export default function Dashboard() {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-      // Create indexing job
-      const { data: job, error: jobError } = await supabase
-        .from('indexing_jobs')
-        .insert([
-          {
-            indexing_type: values.indexingType,
-            status: 'pending',
-            user_id: user.id,
-          }
-        ])
-        .select()
-        .single();
-
-      if (jobError) throw jobError;
-
-      console.log(user.id)
-
-      // Start the job
-      const response = await fetch('/api/jobs', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          jobId: job.id,
-          indexingType: values.indexingType,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to start indexing job');
-      }
-
       toast({
         title: "Success",
         description: "Indexing job created successfully",

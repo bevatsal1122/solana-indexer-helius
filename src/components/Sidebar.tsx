@@ -6,6 +6,8 @@ import { MenuIcon, X, LogOut, Activity, Plus, FileText } from "lucide-react";
 import { useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
+import { signOutUser } from "@/lib/supabaseAdmin";
+import { toast } from "sonner";
 
 interface SidebarProps {
   className?: string;
@@ -16,8 +18,13 @@ export function Sidebar({ className }: SidebarProps) {
   const router = useRouter();
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
-    router.push("/");
+    const { success, error } = await signOutUser();
+    if (success) {
+      router.push("/");
+    } else {
+      console.error(error);
+      toast.error(error);
+    }
   };
 
   return (
