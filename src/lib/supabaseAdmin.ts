@@ -3,6 +3,7 @@
 import { createClient } from "@supabase/supabase-js";
 import { AuthResponse } from "./types";
 import { Database } from "./database.types";
+
 if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
   throw new Error("Missing env.NEXT_PUBLIC_SUPABASE_URL");
 }

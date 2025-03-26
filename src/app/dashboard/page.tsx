@@ -1,17 +1,58 @@
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+"use client";
+
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Briefcase, Calendar, FileText, Award, Mail } from "lucide-react";
 import {
-    Breadcrumb,
-    BreadcrumbItem,
-    BreadcrumbLink,
-    BreadcrumbList,
-    BreadcrumbPage,
-    BreadcrumbSeparator,
-  } from "@/components/ui/breadcrumb";
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 import { Sidebar } from "@/components/Sidebar";
+import { useEffect, useState } from "react";
+import { getLoggedInUser } from "@/lib/supabaseAdmin";
+import { supabase } from "@/lib/supabase";
 
 export default function StatsPage() {
+  const [user, setUser] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    const getUser = async () => {
+      const { data } = await getLoggedInUser();
+
+      if (data?.user) {
+        setUser(data.user);
+        fetchActiveJobs();
+        const interval = setInterval(fetchActiveJobs, 5000);
+        return () => clearInterval(interval);
+      } else {
+        window.location.href = "/auth";
+      }
+    };
+
+    getUser();
+  }, []);
+
+  async function fetchActiveJobs() {
+    try {
+      const { data: jobs, error } = await supabase
+        .from("indexing_jobs")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(5);
+
+      if (error) throw error;
+      //   setActiveJobs(jobs);
+    } catch (error: any) {
+      console.error("Error fetching jobs:", error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return (
     <div className="flex gap-8 min-h-screen">
       <div className="w-[250px] shrink-0">
@@ -41,31 +82,41 @@ export default function StatsPage() {
               </CardHeader>
               <CardContent className="mb-1">
                 <div className="text-4xl font-bold">24</div>
-                <p className="text-sm text-muted-foreground mt-2">Active jobs in the system</p>
+                <p className="text-sm text-muted-foreground mt-2">
+                  Active jobs in the system
+                </p>
               </CardContent>
             </Card>
 
             {/* Recent Jobs */}
             <Card className="border shadow-sm">
               <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle className="text-xl font-medium">Recent Jobs</CardTitle>
+                <CardTitle className="text-xl font-medium">
+                  Recent Jobs
+                </CardTitle>
                 <Calendar className="h-6 w-6 text-muted-foreground" />
               </CardHeader>
               <CardContent className="mb-1">
                 <div className="text-4xl font-bold">7</div>
-                <p className="text-sm text-muted-foreground mt-2">Created in the last 7 days</p>
+                <p className="text-sm text-muted-foreground mt-2">
+                  Created in the last 7 days
+                </p>
               </CardContent>
             </Card>
 
             {/* Entries Processed */}
             <Card className="border shadow-sm">
               <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle className="text-xl font-medium">Entries Processed</CardTitle>
+                <CardTitle className="text-xl font-medium">
+                  Entries Processed
+                </CardTitle>
                 <FileText className="h-6 w-6 text-muted-foreground" />
               </CardHeader>
               <CardContent className="mb-1">
                 <div className="text-4xl font-bold">1,284</div>
-                <p className="text-sm text-muted-foreground mt-2">Total entries processed</p>
+                <p className="text-sm text-muted-foreground mt-2">
+                  Total entries processed
+                </p>
               </CardContent>
             </Card>
 
@@ -77,7 +128,9 @@ export default function StatsPage() {
               </CardHeader>
               <CardContent className="mb-1">
                 <div className="text-4xl font-bold">Analytics</div>
-                <p className="text-sm text-muted-foreground mt-2">Type: Report</p>
+                <p className="text-sm text-muted-foreground mt-2">
+                  Type: Report
+                </p>
               </CardContent>
             </Card>
           </div>
@@ -100,7 +153,10 @@ export default function StatsPage() {
 
           {/* Contact Developer */}
           <div className="flex justify-center mt-12">
-            <Button variant="outline" className="flex items-center border shadow-sm px-6 py-5 text-lg">
+            <Button
+              variant="outline"
+              className="flex items-center border shadow-sm px-6 py-5 text-lg"
+            >
               <Mail className="mr-3 h-5 w-5" />
               Contact the Developer
             </Button>
@@ -108,6 +164,5 @@ export default function StatsPage() {
         </div>
       </main>
     </div>
-  )
+  );
 }
-
