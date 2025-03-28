@@ -6,7 +6,9 @@ import { Input } from "@/components/ui/input";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
-import { signUpUser, signInUser, getLoggedInUser } from "@/lib/supabaseAdmin";
+import { signUpUser, signInUser } from "@/lib/supabaseAdmin";
+import { supabase } from "@/lib/supabase";
+import { setAuthCookie, getAuthCookie } from "@/lib/cookies";
 
 export default function Auth() {
   const [email, setEmail] = useState("");
@@ -16,16 +18,34 @@ export default function Auth() {
   const { toast } = useToast();
 
   useEffect(() => {
-    const getUser = async () => {
-      const { data } = await getLoggedInUser();
-
-      if (data?.user) {
-        router.push("/dashboard");
+    const checkSession = async () => {
+      // Check if we have a token in cookies
+      const token = getAuthCookie();
+      
+      console.log("token", token);
+      
+      if (token) {
+        try {
+          // Verify that we can actually get the user data
+          const { data: { user }, error } = await supabase.auth.getUser(token);
+          
+          if (user && !error) {
+            console.log("user", user);
+            router.push("/dashboard");
+            return;
+          }
+          // If token exists but user data can't be retrieved, the token is invalid
+          // We'll continue to check the session below
+        } catch (error) {
+          console.error("Error verifying user token:", error);
+          // If error occurred, we'll continue to check the session below
+        }
       }
+      
     };
 
-    getUser();
-  }, []);
+    checkSession();
+  }, [router]);
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -59,6 +79,11 @@ export default function Auth() {
 
       if (!response.success) {
         throw new Error(response.error);
+      }
+
+      if (response.accessToken) {
+        // Store the access token in cookies
+        setAuthCookie(response.accessToken);
       }
 
       router.push("/dashboard");

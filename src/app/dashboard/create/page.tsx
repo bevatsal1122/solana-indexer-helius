@@ -29,6 +29,7 @@ import { IndexingJob } from "@/lib/types";
 import { AlertCircle, CheckCircle2, Loader2 } from "lucide-react";
 import { Sidebar } from "@/components/Sidebar";
 import { getLoggedInUser } from "@/lib/supabaseAdmin";
+import { useAuth } from "@/lib/useAuth";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -53,10 +54,10 @@ const formSchema = z.object({
 });
 
 export default function CreateIndexerJob() {
-  const [activeJobs, setActiveJobs] = useState<IndexingJob[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState<any>(null);
+  const { user, loading } = useAuth({ redirectTo: "/auth" });
   const { toast } = useToast();
+
+  console.log("user", user);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -66,45 +67,12 @@ export default function CreateIndexerJob() {
     },
   });
 
-  useEffect(() => {
-    const getUser = async () => {
-      const { data } = await getLoggedInUser();
-
-      if (data?.user) {
-        setUser(data.user);
-      } else {
-        window.location.href = "/auth";
-      }
-    };
-
-    getUser();
-  }, []);
-
-  async function fetchActiveJobs() {
-    try {
-      const { data: jobs, error } = await supabase
-        .from("indexing_jobs")
-        .select("*")
-        .order("created_at", { ascending: false })
-        .limit(5);
-
-      if (error) throw error;
-      //   setActiveJobs(jobs);
-    } catch (error: any) {
-      console.error("Error fetching jobs:", error);
-    } finally {
-      setLoading(false);
-    }
-  }
-
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
       toast({
         title: "Success",
         description: "Indexing job created successfully",
       });
-
-      fetchActiveJobs();
     } catch (error: any) {
       toast({
         title: "Error",
@@ -114,133 +82,6 @@ export default function CreateIndexerJob() {
   }
 
   return (
-    // <div className="flex min-h-screen">
-    //   <Sidebar />
-    //   <Breadcrumb>
-    //     <BreadcrumbList>
-    //       <BreadcrumbItem>
-    //         <BreadcrumbLink href="/">Home</BreadcrumbLink>
-    //       </BreadcrumbItem>
-    //       <BreadcrumbSeparator />
-    //       <BreadcrumbItem>
-    //         <BreadcrumbPage>Dashboard</BreadcrumbPage>
-    //       </BreadcrumbItem>
-    //     </BreadcrumbList>
-    //   </Breadcrumb>
-
-    //   <div className="flex-1 ml-64 p-8">
-    //     <div className="max-w-4xl mx-auto">
-    //       <h1 className="text-3xl font-bold mb-8 text-center">Configure Your Indexer</h1>
-
-    //       <div className="space-y-8">
-    //         <Card className="p-6">
-    //           <Form {...form}>
-    //             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-    //               <FormField
-    //                 control={form.control}
-    //                 name="dbHost"
-    //                 render={({ field }) => (
-    //                   <FormItem>
-    //                     <FormLabel>Database Host</FormLabel>
-    //                     <FormControl>
-    //                       <Input placeholder="localhost" {...field} />
-    //                     </FormControl>
-    //                     <FormMessage />
-    //                   </FormItem>
-    //                 )}
-    //               />
-
-    //               <FormField
-    //                 control={form.control}
-    //                 name="dbPort"
-    //                 render={({ field }) => (
-    //                   <FormItem>
-    //                     <FormLabel>Database Port</FormLabel>
-    //                     <FormControl>
-    //                       <Input {...field} />
-    //                     </FormControl>
-    //                     <FormMessage />
-    //                   </FormItem>
-    //                 )}
-    //               />
-
-    //               <FormField
-    //                 control={form.control}
-    //                 name="dbName"
-    //                 render={({ field }) => (
-    //                   <FormItem>
-    //                     <FormLabel>Database Name</FormLabel>
-    //                     <FormControl>
-    //                       <Input {...field} />
-    //                     </FormControl>
-    //                     <FormMessage />
-    //                   </FormItem>
-    //                 )}
-    //               />
-
-    //               <FormField
-    //                 control={form.control}
-    //                 name="dbUser"
-    //                 render={({ field }) => (
-    //                   <FormItem>
-    //                     <FormLabel>Database User</FormLabel>
-    //                     <FormControl>
-    //                       <Input {...field} />
-    //                     </FormControl>
-    //                     <FormMessage />
-    //                   </FormItem>
-    //                 )}
-    //               />
-
-    //               <FormField
-    //                 control={form.control}
-    //                 name="dbPassword"
-    //                 render={({ field }) => (
-    //                   <FormItem>
-    //                     <FormLabel>Database Password</FormLabel>
-    //                     <FormControl>
-    //                       <Input type="password" {...field} />
-    //                     </FormControl>
-    //                     <FormMessage />
-    //                   </FormItem>
-    //                 )}
-    //               />
-
-    //               <FormField
-    //                 control={form.control}
-    //                 name="indexingType"
-    //                 render={({ field }) => (
-    //                   <FormItem>
-    //                     <FormLabel>What would you like to index?</FormLabel>
-    //                     <Select onValueChange={field.onChange} defaultValue={field.value}>
-    //                       <FormControl>
-    //                         <SelectTrigger>
-    //                           <SelectValue placeholder="Select what to index" />
-    //                         </SelectTrigger>
-    //                       </FormControl>
-    //                       <SelectContent>
-    //                         <SelectItem value="nft_bids">Current NFT Bids</SelectItem>
-    //                         <SelectItem value="nft_prices">NFT Prices</SelectItem>
-    //                         <SelectItem value="token_prices">Token Prices</SelectItem>
-    //                         <SelectItem value="token_borrowing">Available Tokens to Borrow</SelectItem>
-    //                       </SelectContent>
-    //                     </Select>
-    //                     <FormDescription>
-    //                       Choose what blockchain data you want to index
-    //                     </FormDescription>
-    //                     <FormMessage />
-    //                   </FormItem>
-    //                 )}
-    //               />
-
-    //               <Button type="submit" className="w-full h-12 text-lg">Start Indexing</Button>
-    //             </form>
-    //           </Form>
-    //         </Card>
-    //       </div>
-    //     </div>
-    //   </div>
-    // </div>
     <div className="flex gap-8 min-h-screen">
       <div className="w-[250px] shrink-0">
         <Sidebar />
@@ -253,18 +94,19 @@ export default function CreateIndexerJob() {
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbPage>Dashboard</BreadcrumbPage>
+              <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>Create Indexer Job</BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
         <div className="container pb-10 mt-2 bg-background text-foreground max-w-6xl">
-          <h1 className="text-4xl font-bold mb-10">Dashboard</h1>
+          <h1 className="text-4xl font-bold mb-10">Create Indexer Job</h1>
 
-          <div className="flex-1 ml-64 p-8">
+          <div className="flex-1 p-8">
             <div className="max-w-4xl mx-auto">
-              <h1 className="text-3xl font-bold mb-8 text-center">
-                Configure Your Indexer
-              </h1>
 
               <div className="space-y-8">
                 <Card className="p-6">

@@ -9,6 +9,7 @@ export interface AuthResponse {
   error?: string;
   data?: any;
   session?: any;
+  accessToken?: string;
 }
 
 export interface IndexingJob {

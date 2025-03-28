@@ -9,6 +9,7 @@ import { supabase } from "@/lib/supabase";
 import { useRouter, usePathname } from "next/navigation";
 import { signOutUser } from "@/lib/supabaseAdmin";
 import { toast } from "sonner";
+import { removeAuthCookie } from "@/lib/cookies";
 
 interface SidebarProps {
   className?: string;
@@ -20,6 +21,10 @@ export function Sidebar({ className }: SidebarProps) {
   const pathname = usePathname();
 
   const handleLogout = async () => {
+    // Remove the auth cookie first
+    removeAuthCookie();
+    
+    // Then sign out from Supabase
     const { success, error } = await signOutUser();
     if (success) {
       router.push("/");
@@ -102,12 +107,12 @@ export function Sidebar({ className }: SidebarProps) {
                 </Button>
               </Link>
 
-              <Link href="/dashboard/indexer-logs">
+              <Link href="/dashboard/logs">
                 <Button
                   variant="ghost"
                   className={cn(
                     "w-full justify-start text-base rounded-xl transition-all duration-300 hover:bg-gradient-to-r hover:from-primary/5 hover:to-primary/10 hover:scale-[1.02] group",
-                    pathname === "/dashboard/indexer-logs" && "bg-gradient-to-r from-primary/5 to-primary/10 scale-[1.02]"
+                    pathname === "/dashboard/logs" && "bg-gradient-to-r from-primary/5 to-primary/10 scale-[1.02]"
                   )}
                   size="lg"
                 >

@@ -15,44 +15,12 @@ import { Sidebar } from "@/components/Sidebar";
 import { useEffect, useState } from "react";
 import { getLoggedInUser } from "@/lib/supabaseAdmin";
 import { supabase } from "@/lib/supabase";
+import { useAuth } from "@/lib/useAuth";
 
 export default function StatsPage() {
-  const [user, setUser] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-  
-  useEffect(() => {
-    const getUser = async () => {
-      const { data } = await getLoggedInUser();
+  const { user, loading } = useAuth({ redirectTo: "/auth" });
 
-      if (data?.user) {
-        setUser(data.user);
-        fetchActiveJobs();
-        const interval = setInterval(fetchActiveJobs, 5000);
-        return () => clearInterval(interval);
-      } else {
-        window.location.href = "/auth";
-      }
-    };
-
-    getUser();
-  }, []);
-
-  async function fetchActiveJobs() {
-    try {
-      const { data: jobs, error } = await supabase
-        .from("indexing_jobs")
-        .select("*")
-        .order("created_at", { ascending: false })
-        .limit(5);
-
-      if (error) throw error;
-      //   setActiveJobs(jobs);
-    } catch (error: any) {
-      console.error("Error fetching jobs:", error);
-    } finally {
-      setLoading(false);
-    }
-  }
+  console.log("user", user);
 
   return (
     <div className="flex gap-8 min-h-screen">

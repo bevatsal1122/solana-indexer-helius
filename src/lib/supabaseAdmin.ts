@@ -98,10 +98,14 @@ export async function signInUser(
       throw new Error(sessionError.message);
     }
 
+    // Extract the access token for cookie storage
+    const accessToken = session?.access_token;
+
     return {
       success: true,
       data,
       session,
+      accessToken,
     };
   } catch (error: any) {
     return {
@@ -115,9 +119,11 @@ export async function signInUser(
 
 export async function getLoggedInUser(): Promise<AuthResponse> {
   try {
+    // Try to get user from server-side
     const { data, error } = await supabaseAdmin.auth.getUser();
 
     if (error) {
+      console.error("Error getting user:", error.message);
       throw new Error(error.message);
     }
 
@@ -145,6 +151,7 @@ export async function getLoggedInUser(): Promise<AuthResponse> {
       data,
     };
   } catch (error: any) {
+    console.error("Auth error:", error.message);
     return {
       success: false,
       error:
@@ -156,19 +163,51 @@ export async function getLoggedInUser(): Promise<AuthResponse> {
 
 export async function signOutUser() {
   try {
-    const { error } = await supabaseAdmin.auth.signOut();
+    // Sign out from server-side
+    const { error: serverError } = await supabaseAdmin.auth.signOut();
 
-    if (error) {
-      throw new Error(error.message);
+    if (serverError) {
+      console.error("Server-side sign out error:", serverError.message);
     }
 
     return {
       success: true,
     };
   } catch (error: any) {
+    console.error("Sign out error:", error.message);
     return {
       success: false,
       error: error.message,
+    };
+  }
+}
+
+// Add a function to get user by token
+export async function getUserByToken(token: string): Promise<AuthResponse> {
+  try {
+    // Set the auth token in the supabase client
+    const { data, error } = await supabaseAdmin.auth.getUser(token);
+
+    if (error) {
+      console.error("Error getting user by token:", error.message);
+      throw new Error(error.message);
+    }
+
+    if (!data.user) {
+      throw new Error("User not found");
+    }
+
+    return {
+      success: true,
+      data,
+    };
+  } catch (error: any) {
+    console.error("Auth token error:", error.message);
+    return {
+      success: false,
+      error:
+        error.message.charAt(0).toUpperCase() +
+        error.message.slice(1).replace("_", " "),
     };
   }
 }
