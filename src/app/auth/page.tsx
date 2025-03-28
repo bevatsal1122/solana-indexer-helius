@@ -19,9 +19,9 @@ export default function Auth() {
     const getUser = async () => {
       const { data } = await getLoggedInUser();
 
-      // if (data?.user) {
-      //   router.push("/dashboard");
-      // }
+      if (data?.user) {
+        router.push("/dashboard");
+      }
     };
 
     getUser();
@@ -63,7 +63,6 @@ export default function Auth() {
 
       router.push("/dashboard");
     } catch (error: any) {
-      console.log("at frontend", error);
       toast({
         title: error.message,
         theme: "light",

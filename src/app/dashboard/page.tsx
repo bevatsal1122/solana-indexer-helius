@@ -19,6 +19,7 @@ import { supabase } from "@/lib/supabase";
 export default function StatsPage() {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  
   useEffect(() => {
     const getUser = async () => {
       const { data } = await getLoggedInUser();
