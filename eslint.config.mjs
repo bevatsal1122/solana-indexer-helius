@@ -9,7 +9,11 @@ const compat = new FlatCompat({
   baseDirectory: __dirname,
 });
 
-// Disable ESLint by returning an empty array
-const eslintConfig = [];
+const eslintConfig = [
+  {
+    files: ["**/*.{js,ts,jsx,tsx}"],
+    extends: ["next/core-web-vitals", "plugin:tailwindcss/recommended"],
+  },
+];
 
 export default eslintConfig;
