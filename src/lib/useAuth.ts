@@ -2,8 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { supabase } from "./supabase";
-import { getUserByToken } from "./supabaseAdmin";
+import { supabase, getUserByToken } from "./supabase"
 import { getAuthCookie, removeAuthCookie } from "./cookies";
 
 export function useAuth({ redirectTo }: { redirectTo?: string } = {}) {

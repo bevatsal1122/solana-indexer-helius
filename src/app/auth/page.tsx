@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
-import { signUpUser, signInUser } from "@/lib/supabaseAdmin";
+import { signUpUser, signInUser, getUserByToken } from "@/lib/supabase";
 import { supabase } from "@/lib/supabase";
 import { setAuthCookie, getAuthCookie } from "@/lib/cookies";
 
@@ -27,15 +27,23 @@ export default function Auth() {
       if (token) {
         try {
           // Verify that we can actually get the user data
-          const { data: { user }, error } = await supabase.auth.getUser(token);
+          const { success, data } = await getUserByToken(token);
           
-          if (user && !error) {
-            console.log("user", user);
+          if (success && data?.user) {
+            console.log("user", data.user);
             router.push("/dashboard");
             return;
           }
           // If token exists but user data can't be retrieved, the token is invalid
           // We'll continue to check the session below
+
+          const { data: { session } } = await supabase.auth.getSession();
+
+          if (session) {
+            console.log("session", session);
+            router.push("/dashboard");
+            return;
+          }
         } catch (error) {
           console.error("Error verifying user token:", error);
           // If error occurred, we'll continue to check the session below

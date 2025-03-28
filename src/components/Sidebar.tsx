@@ -6,7 +6,7 @@ import { MenuIcon, X, LogOut, Activity, Plus, FileText } from "lucide-react";
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
-import { signOutUser } from "@/lib/supabaseAdmin";
+import { signOutUser } from "@/lib/supabase";
 import { toast } from "sonner";
 import { removeAuthCookie } from "@/lib/cookies";
 
@@ -20,16 +20,23 @@ export function Sidebar({ className }: SidebarProps) {
   const pathname = usePathname();
 
   const handleLogout = async () => {
-    // Remove the auth cookie first
-    removeAuthCookie();
-    
-    // Then sign out from Supabase
-    const { success, error } = await signOutUser();
-    if (success) {
-      router.push("/");
-    } else {
-      console.error(error);
-      toast.error(error);
+    try {
+      // Remove the auth cookie first
+      removeAuthCookie();
+      
+      // Then sign out from Supabase
+      const { success, error } = await signOutUser();
+      
+      if (success) {
+        // Force a hard refresh to clear any cached state
+        window.location.href = "/";
+      } else {
+        console.error(error);
+        toast.error(error || "Failed to sign out");
+      }
+    } catch (error: any) {
+      console.error("Logout error:", error);
+      toast.error("Failed to sign out");
     }
   };
 
