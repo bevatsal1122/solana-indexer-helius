@@ -89,9 +89,19 @@ export async function signInUser(
       throw error;
     }
 
+    const {
+      data: { session },
+      error: sessionError,
+    } = await supabaseAdmin.auth.getSession();
+
+    if (sessionError) {
+      throw new Error(sessionError.message);
+    }
+
     return {
       success: true,
       data,
+      session,
     };
   } catch (error: any) {
     return {

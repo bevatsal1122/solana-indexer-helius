@@ -8,6 +8,7 @@ export interface AuthResponse {
   success: boolean;
   error?: string;
   data?: any;
+  session?: any;
 }
 
 export interface IndexingJob {

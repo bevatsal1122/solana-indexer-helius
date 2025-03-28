@@ -6,7 +6,7 @@ import { MenuIcon, X, LogOut, Activity, Plus, FileText } from "lucide-react";
 import { useState } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { signOutUser } from "@/lib/supabaseAdmin";
 import { toast } from "sonner";
 
@@ -17,6 +17,7 @@ interface SidebarProps {
 export function Sidebar({ className }: SidebarProps) {
   const [isOpen, setIsOpen] = useState(true);
   const router = useRouter();
+  const pathname = usePathname();
 
   const handleLogout = async () => {
     const { success, error } = await signOutUser();
@@ -49,64 +50,89 @@ export function Sidebar({ className }: SidebarProps) {
         )}
       >
         <div className="flex flex-col h-full p-6">
-          <div className="space-y-8 flex-1">
+          <div className="space-y-16 flex-1">
             {/* Header with logo/brand */}
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-3 mt-6">
               <Activity className="h-8 w-8 text-primary" />
-              <h2 className="text-2xl font-bold text-primary">Solana Indexer</h2>
+              <h2 className="text-2xl font-bold text-primary">
+                Solana Indexer
+              </h2>
             </div>
 
             {/* Navigation Section */}
-            <div className="space-y-1">
-              <p className="text-sm font-medium text-muted-foreground px-3 mb-2">
-                MAIN MENU
-              </p>
-              <Link href="/dashboard">
+            <div className="flex flex-col space-y-2">
+              <Link href="/dashboard" className="w-full">
                 <Button
                   variant="ghost"
-                  className="w-full justify-start text-base rounded-xl transition-all duration-300 hover:bg-gradient-to-r hover:from-primary/5 hover:to-primary/10 hover:scale-[1.02] group"
-                size="lg"
-              >
+                  className={cn(
+                    "w-full justify-start text-base rounded-xl transition-all duration-300 hover:bg-gradient-to-r hover:from-primary/5 hover:to-primary/10 hover:scale-[1.02] group",
+                    pathname === "/dashboard" && "bg-gradient-to-r from-primary/5 to-primary/10 scale-[1.02]"
+                  )}
+                  size="lg"
+                >
                   <Activity className="mr-3 h-5 w-5 group-hover:text-primary transition-colors" />
-                  My Indexers
+                  Dashboard
+                </Button>
+              </Link>
+              <Link href="/dashboard/myjobs">
+                <Button
+                  variant="ghost"
+                  className={cn(
+                    "w-full justify-start text-base rounded-xl transition-all duration-300 hover:bg-gradient-to-r hover:from-primary/5 hover:to-primary/10 hover:scale-[1.02] group",
+                    pathname === "/dashboard/myjobs" && "bg-gradient-to-r from-primary/5 to-primary/10 scale-[1.02]"
+                  )}
+                  size="lg"
+                >
+                  <Activity className="mr-3 h-5 w-5 group-hover:text-primary transition-colors" />
+                  My Indexer Jobs
                 </Button>
               </Link>
 
               <Link href="/dashboard/create">
                 <Button
                   variant="ghost"
-                  className="w-full justify-start text-base rounded-xl transition-all duration-300 hover:bg-gradient-to-r hover:from-primary/5 hover:to-primary/10 hover:scale-[1.02] group"
+                  className={cn(
+                    "w-full justify-start text-base rounded-xl transition-all duration-300 hover:bg-gradient-to-r hover:from-primary/5 hover:to-primary/10 hover:scale-[1.02] group",
+                    pathname === "/dashboard/create" && "bg-gradient-to-r from-primary/5 to-primary/10 scale-[1.02]"
+                  )}
                   size="lg"
-              >
-                <Plus className="mr-3 h-5 w-5 group-hover:text-primary transition-colors" />
-                Add Indexer
-              </Button>
+                >
+                  <Plus className="mr-3 h-5 w-5 group-hover:text-primary transition-colors" />
+                  Create Indexer Job
+                </Button>
               </Link>
 
               <Link href="/dashboard/indexer-logs">
                 <Button
                   variant="ghost"
-                  className="w-full justify-start text-base rounded-xl transition-all duration-300 hover:bg-gradient-to-r hover:from-primary/5 hover:to-primary/10 hover:scale-[1.02] group"
+                  className={cn(
+                    "w-full justify-start text-base rounded-xl transition-all duration-300 hover:bg-gradient-to-r hover:from-primary/5 hover:to-primary/10 hover:scale-[1.02] group",
+                    pathname === "/dashboard/indexer-logs" && "bg-gradient-to-r from-primary/5 to-primary/10 scale-[1.02]"
+                  )}
                   size="lg"
-              >
-                <FileText className="mr-3 h-5 w-5 group-hover:text-primary transition-colors" />
-                  Indexer Logs
+                >
+                  <FileText className="mr-3 h-5 w-5 group-hover:text-primary transition-colors" />
+                  My Indexer Job Logs
                 </Button>
               </Link>
+              <Button
+                variant="ghost"
+                className="w-full justify-start text-base rounded-xl transition-all duration-300 hover:bg-gradient-to-r hover:from-destructive/5 hover:to-destructive/10 hover:scale-[1.02] group"
+                size="lg"
+                onClick={handleLogout}
+              >
+                <LogOut className="mr-3 h-5 w-5 group-hover:text-destructive transition-colors" />
+                <span className="group-hover:text-destructive transition-colors">
+                  Log Out
+                </span>
+              </Button>
             </div>
           </div>
 
-          {/* Footer with logout */}
           <div className="pt-4 border-t">
-            <Button
-              variant="ghost"
-              className="w-full justify-start text-base rounded-xl transition-all duration-300 hover:bg-gradient-to-r hover:from-destructive/5 hover:to-destructive/10 hover:scale-[1.02] group"
-              size="lg"
-              onClick={handleLogout}
-            >
-              <LogOut className="mr-3 h-5 w-5 group-hover:text-destructive transition-colors" />
-              <span className="group-hover:text-destructive transition-colors">Log Out</span>
-            </Button>
+            <span className="text-md text-black font-semibold">
+              Developed by bevatsal1122
+            </span>
           </div>
         </div>
       </div>

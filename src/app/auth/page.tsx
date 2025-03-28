@@ -19,9 +19,9 @@ export default function Auth() {
     const getUser = async () => {
       const { data } = await getLoggedInUser();
 
-      if (data?.user) {
-        router.push("/dashboard");
-      }
+      // if (data?.user) {
+      //   router.push("/dashboard");
+      // }
     };
 
     getUser();
