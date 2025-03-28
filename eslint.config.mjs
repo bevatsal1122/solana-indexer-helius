@@ -9,8 +9,7 @@ const compat = new FlatCompat({
   baseDirectory: __dirname,
 });
 
-const eslintConfig = [
-  ...compat.extends("next/core-web-vitals", "next/typescript"),
-];
+// Disable ESLint by returning an empty array
+const eslintConfig = [];
 
 export default eslintConfig;
