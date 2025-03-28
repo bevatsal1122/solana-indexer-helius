@@ -8,10 +8,8 @@ import {
   BreadcrumbLink,
   BreadcrumbList,
 } from "@/components/ui/breadcrumb";
-import { useState, useEffect } from "react";
 import { Sidebar } from "@/components/Sidebar";
 import { useAuth } from "@/lib/useAuth";
-import { useRouter } from "next/navigation";
 
 export default function JobLogs() {
   const { user, loading: authLoading } = useAuth({ redirectTo: "/auth" });

@@ -5,7 +5,6 @@ import { cn } from "@/lib/utils";
 import { MenuIcon, X, LogOut, Activity, Plus, FileText } from "lucide-react";
 import { useState } from "react";
 import Link from "next/link";
-import { supabase } from "@/lib/supabase";
 import { useRouter, usePathname } from "next/navigation";
 import { signOutUser } from "@/lib/supabaseAdmin";
 import { toast } from "sonner";

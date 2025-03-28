@@ -22,13 +22,8 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import { supabase } from "@/lib/supabase";
-import { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
-import { IndexingJob } from "@/lib/types";
-import { AlertCircle, CheckCircle2, Loader2 } from "lucide-react";
 import { Sidebar } from "@/components/Sidebar";
-import { getLoggedInUser } from "@/lib/supabaseAdmin";
 import { useAuth } from "@/lib/useAuth";
 import {
   Breadcrumb,

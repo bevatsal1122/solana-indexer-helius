@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "./supabase";
-import { getLoggedInUser, getUserByToken } from "./supabaseAdmin";
+import { getUserByToken } from "./supabaseAdmin";
 import { getAuthCookie, removeAuthCookie } from "./cookies";
 
 export function useAuth({ redirectTo }: { redirectTo?: string } = {}) {

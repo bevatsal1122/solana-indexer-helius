@@ -12,9 +12,6 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { Sidebar } from "@/components/Sidebar";
-import { useEffect, useState } from "react";
-import { getLoggedInUser } from "@/lib/supabaseAdmin";
-import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/lib/useAuth";
 
 export default function StatsPage() {

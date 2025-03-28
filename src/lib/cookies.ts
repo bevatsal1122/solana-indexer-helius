@@ -6,7 +6,7 @@ import Cookies from "js-cookie";
 export const AUTH_TOKEN_COOKIE = "supabase_auth_token";
 
 // Cookie expiry in days (30 days = 1 month)
-const COOKIE_EXPIRY = 30;
+const COOKIE_EXPIRY = 1;
 
 export const setAuthCookie = (token: string) => {
   Cookies.set(AUTH_TOKEN_COOKIE, token, {
