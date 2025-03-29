@@ -154,10 +154,10 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const response = await fetch(backendUrl, {
-      method: 'POST',
+    const response = await fetch(backendUrl + "/jobs/create", {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({ jobId: data.id }),
     });
