@@ -33,6 +33,8 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import { supabase } from "@/lib/supabase";
+import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
   dbHost: z.string().min(1, "Database host is required"),
@@ -51,7 +53,7 @@ const formSchema = z.object({
 export default function CreateIndexerJob() {
   const { user, loading } = useAuth({ redirectTo: "/auth" });
   const { toast } = useToast();
-
+  const router = useRouter();
   console.log("user", user);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -64,14 +66,43 @@ export default function CreateIndexerJob() {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-      toast({
-        title: "Success",
-        description: "Indexing job created successfully",
+      const token = await supabase.auth.getSession();
+      console.log("token", token);
+      // Convert form values to match API schema
+      const payload = {
+        name: `${values.indexingType}-indexer`,
+        description: `Indexer for ${values.indexingType}`,
+        db_host: values.dbHost,
+        db_port: values.dbPort,
+        db_name: values.dbName,
+        db_user: values.dbUser,
+        db_password: values.dbPassword,
+        type: values.indexingType,
+      };
+
+      const response = await fetch("/api/jobs", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token.data.session?.access_token}`,
+        },
+        body: JSON.stringify(payload),
       });
-    } catch (error: any) {
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to create indexer job");
+      }
+
       toast({
-        title: "Error",
-        description: error.message,
+        title: "Success! Indexing job created successfully",
+      });
+      router.push("/dashboard");
+    } catch (error: any) {
+      console.error("Error creating indexer job:", error);
+      toast({
+        title: "Error creating indexer job",
       });
     }
   }
@@ -102,7 +133,6 @@ export default function CreateIndexerJob() {
 
           <div className="flex-1 p-8">
             <div className="max-w-4xl mx-auto">
-
               <div className="space-y-8">
                 <Card className="p-6">
                   <Form {...form}>

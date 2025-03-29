@@ -60,6 +60,10 @@ export async function signInUser(
   password: string
 ): Promise<AuthResponse> {
   try {
+    if (!email || !password) {
+      throw new Error("Missing email or password");
+    }
+
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
@@ -99,6 +103,21 @@ export async function signInUser(
     // Extract the access token for cookie storage
     const accessToken = session?.access_token;
 
+    // Store user details in users table
+    const { error: upsertError } = await supabase.from("users").upsert(
+      {
+        auth_id: data.user.id,
+        email_id: email,
+      },
+      {
+        onConflict: "auth_id",
+      }
+    );
+
+    if (upsertError) {
+      console.error("Error updating users table:", upsertError);
+    }
+
     return {
       success: true,
       data,
@@ -127,21 +146,6 @@ export async function getLoggedInUser(): Promise<AuthResponse> {
 
     if (!data.user) {
       throw new Error("User not found");
-    }
-
-    // Store user details in users table
-    const { error: upsertError } = await supabase.from("users").upsert(
-      {
-        auth_id: data.user.id,
-        email_id: data.user.email,
-      },
-      {
-        onConflict: "auth_id",
-      }
-    );
-
-    if (upsertError) {
-      console.error("Error updating users table:", upsertError);
     }
 
     return {

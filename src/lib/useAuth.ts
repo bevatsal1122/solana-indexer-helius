@@ -14,6 +14,14 @@ export function useAuth({ redirectTo }: { redirectTo?: string } = {}) {
     const checkUser = async () => {
       try {
         setLoading(true);
+
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        if (session) {
+          console.log("session", session);
+          setUser(session.user);
+          return;
+        }
         
         const token = getAuthCookie();
         
@@ -26,14 +34,6 @@ export function useAuth({ redirectTo }: { redirectTo?: string } = {}) {
           } else {
             removeAuthCookie();
           }
-        }
-        
-        const { data: { session } } = await supabase.auth.getSession();
-        
-        if (session) {
-          console.log("session", session);
-          setUser(session.user);
-          return;
         }
         
         // If no valid authentication, redirect

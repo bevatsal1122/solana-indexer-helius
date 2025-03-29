@@ -22,7 +22,8 @@ export type Database = {
           last_updated: string | null
           name: string
           status: string
-          type: string | null
+          type: string
+          user_id: number
         }
         Insert: {
           created_at?: string
@@ -36,7 +37,8 @@ export type Database = {
           last_updated?: string | null
           name: string
           status?: string
-          type?: string | null
+          type: string
+          user_id: number
         }
         Update: {
           created_at?: string
@@ -50,176 +52,15 @@ export type Database = {
           last_updated?: string | null
           name?: string
           status?: string
-          type?: string | null
-        }
-        Relationships: []
-      }
-      indexing_jobs: {
-        Row: {
-          created_at: string | null
-          id: string
-          indexing_type: string
-          status: string
-          updated_at: string | null
-          user_id: string
-        }
-        Insert: {
-          created_at?: string | null
-          id?: string
-          indexing_type: string
-          status?: string
-          updated_at?: string | null
-          user_id: string
-        }
-        Update: {
-          created_at?: string | null
-          id?: string
-          indexing_type?: string
-          status?: string
-          updated_at?: string | null
-          user_id?: string
-        }
-        Relationships: []
-      }
-      nft_bids: {
-        Row: {
-          bid_amount: number
-          bidder: string
-          created_at: string | null
-          id: string
-          job_id: string
-          mint_address: string
-        }
-        Insert: {
-          bid_amount: number
-          bidder: string
-          created_at?: string | null
-          id?: string
-          job_id: string
-          mint_address: string
-        }
-        Update: {
-          bid_amount?: number
-          bidder?: string
-          created_at?: string | null
-          id?: string
-          job_id?: string
-          mint_address?: string
+          type?: string
+          user_id?: number
         }
         Relationships: [
           {
-            foreignKeyName: "nft_bids_job_id_fkey"
-            columns: ["job_id"]
+            foreignKeyName: "indexer_jobs_user_id_fkey"
+            columns: ["user_id"]
             isOneToOne: false
-            referencedRelation: "indexing_jobs"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      nft_prices: {
-        Row: {
-          created_at: string | null
-          id: string
-          job_id: string
-          marketplace: string
-          mint_address: string
-          price: number
-        }
-        Insert: {
-          created_at?: string | null
-          id?: string
-          job_id: string
-          marketplace: string
-          mint_address: string
-          price: number
-        }
-        Update: {
-          created_at?: string | null
-          id?: string
-          job_id?: string
-          marketplace?: string
-          mint_address?: string
-          price?: number
-        }
-        Relationships: [
-          {
-            foreignKeyName: "nft_prices_job_id_fkey"
-            columns: ["job_id"]
-            isOneToOne: false
-            referencedRelation: "indexing_jobs"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      token_borrowing: {
-        Row: {
-          amount_available: number
-          created_at: string | null
-          id: string
-          interest_rate: number
-          job_id: string
-          platform: string
-          token_address: string
-        }
-        Insert: {
-          amount_available: number
-          created_at?: string | null
-          id?: string
-          interest_rate: number
-          job_id: string
-          platform: string
-          token_address: string
-        }
-        Update: {
-          amount_available?: number
-          created_at?: string | null
-          id?: string
-          interest_rate?: number
-          job_id?: string
-          platform?: string
-          token_address?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "token_borrowing_job_id_fkey"
-            columns: ["job_id"]
-            isOneToOne: false
-            referencedRelation: "indexing_jobs"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      token_prices: {
-        Row: {
-          created_at: string | null
-          id: string
-          job_id: string
-          platform: string
-          price_usd: number
-          token_address: string
-        }
-        Insert: {
-          created_at?: string | null
-          id?: string
-          job_id: string
-          platform: string
-          price_usd: number
-          token_address: string
-        }
-        Update: {
-          created_at?: string | null
-          id?: string
-          job_id?: string
-          platform?: string
-          price_usd?: number
-          token_address?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "token_prices_job_id_fkey"
-            columns: ["job_id"]
-            isOneToOne: false
-            referencedRelation: "indexing_jobs"
+            referencedRelation: "users"
             referencedColumns: ["id"]
           },
         ]
@@ -228,20 +69,20 @@ export type Database = {
         Row: {
           auth_id: string
           created_at: string
+          email_id: string
           id: number
-          updated_at: string
         }
         Insert: {
           auth_id: string
           created_at?: string
+          email_id: string
           id?: number
-          updated_at?: string
         }
         Update: {
           auth_id?: string
           created_at?: string
+          email_id?: string
           id?: number
-          updated_at?: string
         }
         Relationships: []
       }
