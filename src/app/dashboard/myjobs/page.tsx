@@ -200,6 +200,7 @@ export default function MyJobs() {
               </TableCaption>
               <TableHeader>
                 <TableRow>
+                  <TableHead>Job ID</TableHead>
                   <TableHead>Job Name</TableHead>
                   <TableHead>Job Type</TableHead>
                   <TableHead>DB Info</TableHead>
@@ -212,6 +213,7 @@ export default function MyJobs() {
               <TableBody>
                 {jobs.map((job) => (
                   <TableRow key={job.id}>
+                    <TableCell className="font-medium">{job.id}</TableCell>
                     <TableCell className="font-medium">{job.name}</TableCell>
                     <TableCell>{job.type.toUpperCase()}</TableCell>
                     <TableCell>
