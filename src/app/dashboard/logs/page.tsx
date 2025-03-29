@@ -37,7 +37,6 @@ type Job = {
   name: string;
   description: string | null;
   status: string;
-  type: string;
   created_at: string;
   db_host: string;
   db_name: string;
@@ -47,8 +46,8 @@ type LogEntry = {
   id: number;
   job_id: number;
   message: string;
-  level: "info" | "warning" | "error" | "debug";
-  timestamp: string;
+  tag: string;
+  created_at: string;
 };
 
 export default function JobLogs() {
@@ -96,56 +95,41 @@ export default function JobLogs() {
     }
   };
 
-  // Mock fetch logs function - in a real app, you'd have an API endpoint for this
   const fetchLogs = async () => {
-    // Mock logs data for demonstration
-    // In a real app, you would fetch this from your API
-    const mockLogs: LogEntry[] = [
-      {
-        id: 1,
-        job_id: 1,
-        message: "Indexer job started",
-        level: "info",
-        timestamp: new Date(Date.now() - 3600000).toISOString(),
-      },
-      {
-        id: 2,
-        job_id: 1,
-        message: "Connected to database successfully",
-        level: "info",
-        timestamp: new Date(Date.now() - 3500000).toISOString(),
-      },
-      {
-        id: 3,
-        job_id: 1,
-        message: "Warning: Slow query detected",
-        level: "warning",
-        timestamp: new Date(Date.now() - 3400000).toISOString(),
-      },
-      {
-        id: 4,
-        job_id: 1,
-        message: "Indexed 1000 records",
-        level: "info",
-        timestamp: new Date(Date.now() - 3300000).toISOString(),
-      },
-      {
-        id: 5,
-        job_id: 1,
-        message: "Error: Failed to connect to external API",
-        level: "error",
-        timestamp: new Date(Date.now() - 3200000).toISOString(),
-      },
-      {
-        id: 6,
-        job_id: 1,
-        message: "Job completed with errors",
-        level: "info",
-        timestamp: new Date(Date.now() - 3100000).toISOString(),
-      },
-    ];
-    
-    setLogs(mockLogs);
+    try {
+      const { data: session } = await supabase.auth.getSession();
+      
+      if (!session.session) {
+        return;
+      }
+      
+      const response = await fetch("/api/logs", {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${session.session.access_token}`,
+        },
+      });
+      
+      const data = await response.json();
+
+      console.log(data);
+      
+      if (response.ok && data.data) {
+        setLogs(data.data);
+      } else {
+        console.error("Failed to fetch logs:", data.error);
+        toast({
+          title: "Error fetching logs",
+          description: data.error || "An error occurred",
+        });
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch logs",
+      });
+    }
   };
 
   useEffect(() => {
@@ -172,19 +156,13 @@ export default function JobLogs() {
     }
   };
 
-  const getLogLevelStyle = (level: string) => {
-    switch (level) {
-      case "error":
-        return "bg-red-100 text-red-800";
-      case "warning":
-        return "bg-yellow-100 text-yellow-800";
-      case "info":
-        return "bg-blue-100 text-blue-800";
-      case "debug":
-        return "bg-gray-100 text-gray-800";
-      default:
-        return "bg-gray-100 text-gray-800";
-    }
+  const getLogLevelStyle = (tag: string | undefined) => {
+    const tagLower = tag?.toLowerCase() || '';
+    
+    if (tagLower.includes('error')) return "text-red-600";
+    if (tagLower.includes('warn')) return "text-yellow-600";
+    if (tagLower.includes('info')) return "text-green-600";
+    return "text-blue-600";
   };
 
   return (
@@ -275,14 +253,16 @@ export default function JobLogs() {
               {logs.map((log) => (
                 <div key={log.id} className="border rounded-lg p-4 hover:bg-accent/50 transition-colors">
                   <div className="flex items-center justify-between mb-2">
-                    <span className={`px-2 py-1 rounded-full text-xs ${getLogLevelStyle(log.level)}`}>
-                      {log.level.toUpperCase()}
-                    </span>
                     <span className="font-mono text-xs text-muted-foreground">
-                      {formatDate(log.timestamp)}
+                      {formatDate(log.created_at)}
                     </span>
+                    {log.tag && (
+                      <span className={`text-xs font-medium px-2 py-1 rounded ${getLogLevelStyle(log.tag)}`}>
+                        {log.tag.toUpperCase()}
+                      </span>
+                    )}
                   </div>
-                  <p className="text-sm">{log.message}</p>
+                  <p className={`text-sm ${getLogLevelStyle(log.tag)}`}>{log.message}</p>
                 </div>
               ))}
             </div>

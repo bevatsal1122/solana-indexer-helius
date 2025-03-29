@@ -47,6 +47,7 @@ type Job = {
   db_port: string;
   db_user: string;
   db_password: string;
+  entries_processed?: number;
 };
 
 export default function MyJobs() {
@@ -199,12 +200,13 @@ export default function MyJobs() {
               </TableCaption>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Type</TableHead>
-                  <TableHead>Database</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Created</TableHead>
-                  <TableHead className="w-[120px]">Actions</TableHead>
+                  <TableHead>Job Name</TableHead>
+                  <TableHead>Job Type</TableHead>
+                  <TableHead>DB Info</TableHead>
+                  <TableHead>Monthly Entries</TableHead>
+                  <TableHead>Job Status</TableHead>
+                  <TableHead>Creation Date</TableHead>
+                  <TableHead className="w-[120px]">Job Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -214,6 +216,9 @@ export default function MyJobs() {
                     <TableCell>{job.type.toUpperCase()}</TableCell>
                     <TableCell>
                       {job.db_host}/{job.db_name}
+                    </TableCell>
+                    <TableCell>
+                      {job.entries_processed?.toLocaleString() || "0"}
                     </TableCell>
                     <TableCell>
                       <span

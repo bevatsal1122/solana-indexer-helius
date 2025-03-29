@@ -68,6 +68,38 @@ export type Database = {
           },
         ]
       }
+      logs: {
+        Row: {
+          created_at: string
+          id: number
+          job_id: number
+          message: string
+          tag: string
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          job_id: number
+          message: string
+          tag?: string
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          job_id?: number
+          message?: string
+          tag?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "logs_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "indexer_jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       users: {
         Row: {
           auth_id: string
