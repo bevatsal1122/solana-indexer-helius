@@ -339,7 +339,7 @@ export default function JobLogs() {
                       </div>
                       {log.tag && (
                         <span
-                          className={`text-xs font-medium px-2 py-1 rounded ${getLogLevelStyle(
+                          className={`text-sm font-medium px-2 py-1 rounded ${getLogLevelStyle(
                             log.tag
                           )}`}
                         >

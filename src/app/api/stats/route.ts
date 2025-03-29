@@ -37,97 +37,54 @@ export async function GET(req: NextRequest) {
           { status: 404 }
         );
       }
-  
+
       const userId = usersData.id;
       
-      // 1. Count running jobs
-      const { count: runningJobsCount, error: countError } = await supabase
-        .from("indexer_jobs")
-        .select("*", { count: "exact", head: true })
-        .eq("user_id", userId)
-        .eq("status", "running");
-        
-      if (countError) {
-        console.error("Error counting running jobs:", countError);
-        return NextResponse.json(
-          { error: "Failed to count running jobs" },
-          { status: 500 }
-        );
-      }
-      
-      // 2. Sum of entries_processed for running jobs
-      const { data: sumData, error: sumError } = await supabase
-        .from("indexer_jobs")
-        .select("entries_processed")
-        .eq("user_id", userId)
-        // .eq("status", "running");
-        
-      if (sumError) {
-        console.error("Error getting entries_processed sum:", sumError);
-        return NextResponse.json(
-          { error: "Failed to calculate entries processed sum" },
-          { status: 500 }
-        );
-      }
-
-      console.log("Sum data:", sumData);
-      
-      // Add debugging log to see what data we're getting
-      console.log("Entries processed data:", sumData);
-      
-      // Fix calculation to ensure we handle null/undefined values safely
-      const totalEntriesProcessed = sumData.reduce(
-        (sum, job) => {
-          // Log individual job entries for debugging
-          console.log(`Job entries_processed: ${job.entries_processed}`);
-          // Make sure job.entries_processed is a number or default to 0
-          const entries = typeof job.entries_processed === 'number' ? job.entries_processed : 0;
-          return sum + entries;
-        }, 
-        0
-      );
-      
-      console.log("Total entries calculated:", totalEntriesProcessed);
-      
-      // 3. Job with maximum entries_processed
-      const { data: maxJob, error: maxJobError } = await supabase
-        .from("indexer_jobs")
-        .select("*")
-        .eq("user_id", userId)
-        .order("entries_processed", { ascending: false })
-        .limit(1)
-        .single();
-        
-      if (maxJobError && maxJobError.code !== "PGRST116") { // Ignore error if no results
-        console.error("Error getting max job:", maxJobError);
-        return NextResponse.json(
-          { error: "Failed to find job with maximum entries processed" },
-          { status: 500 }
-        );
-      }
-      
-      // 4. Jobs created within last 30 days
+      // Get all jobs for this user in a single query
       const thirtyDaysAgo = new Date();
       thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
       
-      const { data: recentJobs, error: recentJobsError } = await supabase
+      const { data: allJobs, error: jobsError } = await supabase
         .from("indexer_jobs")
         .select("*")
-        .eq("user_id", userId)
-        .gte("created_at", thirtyDaysAgo.toISOString());
+        .eq("user_id", userId);
         
-      if (recentJobsError) {
-        console.error("Error getting recent jobs:", recentJobsError);
+      if (jobsError) {
+        console.error("Error fetching jobs:", jobsError);
         return NextResponse.json(
-          { error: "Failed to fetch recent jobs" },
+          { error: "Failed to fetch jobs data" },
           { status: 500 }
         );
       }
       
+      // Calculate all statistics from the fetched data
+      const runningJobs = allJobs.filter(job => job.status === "running");
+      const runningJobsCount = runningJobs.length;
+      
+      const totalEntriesProcessed = allJobs.reduce((sum, job) => {
+        const entries = typeof job.entries_processed === 'number' ? job.entries_processed : 0;
+        return sum + entries;
+      }, 0);
+      
+      // Find job with maximum entries_processed
+      let maxJob = null;
+      if (allJobs.length > 0) {
+        maxJob = allJobs.reduce((max, job) => {
+          const currentEntries = typeof job.entries_processed === 'number' ? job.entries_processed : 0;
+          const maxEntries = typeof max.entries_processed === 'number' ? max.entries_processed : 0;
+          return currentEntries > maxEntries ? job : max;
+        }, allJobs[0]);
+      }
+      
+      // Filter recent jobs (last 30 days)
+      const recentJobs = allJobs.filter(job => 
+        new Date(job.created_at) >= thirtyDaysAgo
+      );
+      
       return NextResponse.json({
-        running_jobs_count: runningJobsCount || 0,
+        running_jobs_count: runningJobsCount,
         total_entries_processed: totalEntriesProcessed,
-        max_entries_job: maxJob || null,
+        max_entries_job: maxJob,
         recent_jobs_count: recentJobs.length,
         recent_jobs: recentJobs
       }, { status: 200 });
