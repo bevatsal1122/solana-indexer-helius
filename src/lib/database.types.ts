@@ -18,6 +18,7 @@ export type Database = {
           db_port: string
           db_user: string
           description: string | null
+          entries_processed: number
           id: number
           last_updated: string | null
           name: string
@@ -33,6 +34,7 @@ export type Database = {
           db_port: string
           db_user: string
           description?: string | null
+          entries_processed?: number
           id?: number
           last_updated?: string | null
           name: string
@@ -48,6 +50,7 @@ export type Database = {
           db_port?: string
           db_user?: string
           description?: string | null
+          entries_processed?: number
           id?: number
           last_updated?: string | null
           name?: string

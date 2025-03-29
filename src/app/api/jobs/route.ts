@@ -3,6 +3,8 @@ import { AUTH_TOKEN_COOKIE } from "@/lib/cookies";
 import { supabase } from "@/lib/supabase";
 import { z } from "zod";
 
+// Job Types: starting, running, failed
+
 // Validation schema for request body
 const jobSchema = z.object({
   name: z.string().min(1, "Job name is required"),
@@ -129,7 +131,7 @@ export async function POST(req: NextRequest) {
       .insert({
         ...jobData,
         user_id: usersData.id,
-        status: "pending",
+        status: "starting",
         created_at: new Date().toISOString(),
       })
       .select()

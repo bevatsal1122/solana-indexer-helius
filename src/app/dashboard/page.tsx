@@ -14,11 +14,75 @@ import {
 } from "@/components/ui/breadcrumb";
 import { Sidebar } from "@/components/Sidebar";
 import { useAuth } from "@/lib/useAuth";
+import { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabase";
+
+interface JobMetrics {
+  running_jobs_count: number;
+  total_entries_processed: number;
+  max_entries_job: {
+    id: number;
+    name: string;
+    entries_processed: number;
+    type?: string;
+  } | null;
+  recent_jobs_count: number;
+}
 
 export default function StatsPage() {
   const { user, loading } = useAuth({ redirectTo: "/auth" });
+  const [metrics, setMetrics] = useState<JobMetrics | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  console.log("user", user);
+  useEffect(() => {
+    async function fetchMetrics() {
+      try {
+        setIsLoading(true);
+        
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        
+        if (sessionError || !session) {
+          console.error("Session error:", sessionError);
+          setError("Authentication error: Could not retrieve session");
+          setIsLoading(false);
+          return;
+        }
+        
+        const accessToken = session.access_token;
+        console.log("Got access token from session");
+        
+        console.log("Fetching metrics from /api/stats");
+        const response = await fetch('/api/stats', {
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+          },
+        });
+
+        console.log("Response status:", response.status);
+        
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error("Error response:", errorText);
+          throw new Error(`Failed to fetch metrics: ${response.status} ${errorText}`);
+        }
+
+        const data = await response.json();
+        console.log("Metrics data:", data);
+        setMetrics(data);
+      } catch (err: unknown) {
+        console.error('Error fetching metrics:', err);
+        setError(`Failed to load dashboard metrics: ${err instanceof Error ? err.message : 'Unknown error'}`);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    if (!loading) {
+      console.log("Fetching metrics...");
+      fetchMetrics();
+    }
+  }, [loading]);
 
   return (
     <div className="flex gap-8 min-h-screen bg-background">
@@ -40,6 +104,10 @@ export default function StatsPage() {
         <div className="container pb-10 mt-2 bg-background text-foreground max-w-6xl">
           <h1 className="text-4xl font-bold mb-10">Dashboard</h1>
 
+          {error && (
+            <div className="text-center py-8 text-red-500">{error}</div>
+          )}
+
           <div className="grid grid-cols-2 gap-8 mb-10">
             {/* Live Jobs */}
             <Card className="border border-border shadow-sm bg-card text-card-foreground">
@@ -48,7 +116,9 @@ export default function StatsPage() {
                 <Briefcase className="h-6 w-6 text-muted-foreground" />
               </CardHeader>
               <CardContent className="mb-1">
-                <div className="text-4xl font-bold">24</div>
+                <div className="text-4xl font-bold">
+                  {isLoading ? "..." : metrics?.running_jobs_count || 0}
+                </div>
                 <p className="text-sm text-muted-foreground mt-2">
                   Active jobs in the system
                 </p>
@@ -64,9 +134,11 @@ export default function StatsPage() {
                 <Calendar className="h-6 w-6 text-muted-foreground" />
               </CardHeader>
               <CardContent className="mb-1">
-                <div className="text-4xl font-bold">7</div>
+                <div className="text-4xl font-bold">
+                  {isLoading ? "..." : metrics?.recent_jobs_count || 0}
+                </div>
                 <p className="text-sm text-muted-foreground mt-2">
-                  Created in the last 7 days
+                  Created in the last 30 days
                 </p>
               </CardContent>
             </Card>
@@ -80,9 +152,14 @@ export default function StatsPage() {
                 <FileText className="h-6 w-6 text-muted-foreground" />
               </CardHeader>
               <CardContent className="mb-1">
-                <div className="text-4xl font-bold">1,284</div>
+                <div className="text-4xl font-bold">
+                  {isLoading ? "..." : 
+                   (metrics?.total_entries_processed !== undefined && 
+                    metrics?.total_entries_processed !== null) ? 
+                     metrics.total_entries_processed.toLocaleString() : "0"}
+                </div>
                 <p className="text-sm text-muted-foreground mt-2">
-                  Total entries processed
+                  Total entries processed by running jobs
                 </p>
               </CardContent>
             </Card>
@@ -94,30 +171,34 @@ export default function StatsPage() {
                 <Award className="h-6 w-6 text-muted-foreground" />
               </CardHeader>
               <CardContent className="mb-1">
-                <div className="text-4xl font-bold">Analytics</div>
+                <div className="text-4xl font-bold">
+                  {isLoading ? "..." : metrics?.max_entries_job?.name || "No jobs yet"}
+                </div>
                 <p className="text-sm text-muted-foreground mt-2">
-                  Type: Report
+                  {metrics?.max_entries_job ? 
+                    `Processed ${metrics.max_entries_job.entries_processed.toLocaleString()} entries` : 
+                    "Create your first job to see stats"}
                 </p>
               </CardContent>
             </Card>
           </div>
 
           {/* Action Buttons */}
-          <div className="flex gap-6 mb-10 w-full">
-            <Link href="/dashboard/myjobs">
-              <Button className="flex-1 px-8 py-6 text-lg bg-primary text-primary-foreground hover:bg-primary/90">
+          <div className="flex w-full gap-6 mb-10">
+            <Link href="/dashboard/myjobs" className="flex-1 w-full">
+              <Button className="w-full px-8 py-6 text-lg bg-primary text-primary-foreground hover:bg-primary/90">
                 <Briefcase className="mr-3 h-5 w-5" />
                 My Jobs
               </Button>
             </Link>
-            <Link href="/dashboard/create">
-              <Button className="flex-1 px-8 py-6 text-lg bg-primary text-primary-foreground hover:bg-primary/90">
+            <Link href="/dashboard/create" className="flex-1 w-full">
+              <Button className="w-full px-8 py-6 text-lg bg-primary text-primary-foreground hover:bg-primary/90">
                 <Calendar className="mr-3 h-5 w-5" />
                 Create Job
               </Button>
             </Link>
-            <Link href="/dashboard/logs">
-              <Button className="flex-1 px-8 py-6 text-lg bg-primary text-primary-foreground hover:bg-primary/90">
+            <Link href="/dashboard/logs" className="flex-1 w-full">
+              <Button className="w-full px-8 py-6 text-lg bg-primary text-primary-foreground hover:bg-primary/90">
                 <FileText className="mr-3 h-5 w-5" />
                 Job Logs
               </Button>
