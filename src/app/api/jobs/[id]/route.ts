@@ -99,9 +99,11 @@ export async function DELETE(
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
+
     const authToken = request.headers.get("Authorization")?.split(" ")[1];
 
     if (!authToken) {
@@ -123,7 +125,7 @@ export async function GET(
       );
     }
 
-    const jobId = parseInt(params.id);
+    const jobId = parseInt(id);
     if (isNaN(jobId)) {
       return NextResponse.json(
         { error: "Invalid Job ID" },
