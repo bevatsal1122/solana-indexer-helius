@@ -154,25 +154,27 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const response = await fetch(serverUrl + "/jobs/create", {
+    const response = NextResponse.json({ success: true, data }, { status: 201 });
+
+    fetch(serverUrl + "/jobs/create", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ jobId: data.id }),
-    });
+    })
+      .then(fetchResponse => {
+        if (!fetchResponse.ok) {
+          console.error("Failed to send job to backend:", fetchResponse.statusText);
+        } else {
+          console.log("Job successfully sent to backend");
+        }
+      })
+      .catch(error => {
+        console.error("Error sending job to backend:", error);
+      });
 
-    console.log("Response:", response);
-
-    if (!response.ok) {
-      console.error("Failed to send job to backend:", response.statusText);
-      return NextResponse.json(
-        { error: "Failed to process job" },
-        { status: 500 }
-      );
-    }
-
-    return NextResponse.json({ success: true, data }, { status: 201 });
+    return response;
   } catch (error) {
     console.error("Unexpected error:", error);
     return NextResponse.json(

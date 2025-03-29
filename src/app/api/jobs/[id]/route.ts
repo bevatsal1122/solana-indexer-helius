@@ -58,6 +58,20 @@ export async function DELETE(
       );
     }
 
+    // First delete all logs associated with the job
+    const { error: logsDeleteError } = await supabase
+      .from("logs")
+      .delete()
+      .eq("job_id", jobId);
+
+    if (logsDeleteError) {
+      console.error("Error deleting job logs:", logsDeleteError);
+      return NextResponse.json(
+        { error: "Failed to delete job logs" },
+        { status: 500 }
+      );
+    }
+
     // Delete the job
     const { error: deleteError } = await supabase
       .from("indexer_jobs")

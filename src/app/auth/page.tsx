@@ -34,7 +34,6 @@ export default function Auth() {
             router.push("/dashboard");
             return;
           }
-          // If token exists but user data can't be retrieved, the token is invalid
           // We'll continue to check the session below
 
           const { data: { session } } = await supabase.auth.getSession();
@@ -117,6 +116,7 @@ export default function Auth() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="h-10 bg-input text-foreground"
+                required
               />
             </div>
             <div>
@@ -126,6 +126,7 @@ export default function Auth() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="h-10 bg-input text-foreground"
+                required
               />
             </div>
           </div>
@@ -134,7 +135,7 @@ export default function Auth() {
             <Button
               className="w-full h-10 bg-primary text-primary-foreground hover:bg-primary/90"
               onClick={handleSignIn}
-              disabled={loading}
+              disabled={loading || !email || !password}
             >
               Sign In
             </Button>
@@ -142,7 +143,7 @@ export default function Auth() {
               className="w-full h-10 border-primary hover:bg-accent hover:text-accent-foreground"
               variant="outline"
               onClick={handleSignUp}
-              disabled={loading}
+              disabled={loading || !email || !password}
             >
               Sign Up
             </Button>

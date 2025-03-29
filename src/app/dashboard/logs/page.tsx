@@ -141,7 +141,7 @@ export default function JobLogs() {
       // Set up polling every 10 seconds
       const intervalId = setInterval(() => {
         Promise.all([fetchJobs(), fetchLogs()]);
-      }, 10000);
+      }, 3000);
       
       // Clean up the interval when component unmounts
       return () => clearInterval(intervalId);
@@ -250,12 +250,21 @@ export default function JobLogs() {
             </div>
           ) : (
             <div className="space-y-4">
-              {logs.map((log) => (
+              {logs.map((log) => {
+                const job = jobs.find(j => j.id === log.job_id);
+                return (
                 <div key={log.id} className="border rounded-lg p-4 hover:bg-accent/50 transition-colors">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="font-mono text-xs text-muted-foreground">
-                      {formatDate(log.created_at)}
-                    </span>
+                    <div className="flex items-center gap-2">
+                      <span className="font-mono text-xs text-muted-foreground">
+                        {formatDate(log.created_at)}
+                      </span>
+                      {job && (
+                        <span className="text-xs bg-primary/10 px-2 py-0.5 rounded">
+                          Job #{log.job_id}: {job.name}
+                        </span>
+                      )}
+                    </div>
                     {log.tag && (
                       <span className={`text-xs font-medium px-2 py-1 rounded ${getLogLevelStyle(log.tag)}`}>
                         {log.tag.toUpperCase()}
@@ -264,7 +273,7 @@ export default function JobLogs() {
                   </div>
                   <p className={`text-sm ${getLogLevelStyle(log.tag)}`}>{log.message}</p>
                 </div>
-              ))}
+              )})}
             </div>
           )}
         </div>
