@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
+import { NextRequest } from "next/server";
 
 export async function DELETE(
   request: Request,
@@ -91,6 +92,79 @@ export async function DELETE(
     console.error("Unexpected error:", error);
     return NextResponse.json(
       { error: "An unexpected error occurred" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const authToken = request.headers.get("Authorization")?.split(" ")[1];
+
+    if (!authToken) {
+      return NextResponse.json(
+        { error: "Unauthorized: Authentication required" },
+        { status: 401 }
+      );
+    }
+
+    // Get the user from the token
+    const { data: userData, error: userError } = await supabase.auth.getUser(
+      authToken
+    );
+
+    if (userError || !userData.user) {
+      return NextResponse.json(
+        { error: "Unauthorized: Invalid authentication token" },
+        { status: 401 }
+      );
+    }
+
+    const jobId = parseInt(params.id);
+    if (isNaN(jobId)) {
+      return NextResponse.json(
+        { error: "Invalid Job ID" },
+        { status: 400 }
+      );
+    }
+
+    // Get user ID from users table using auth_id
+    const { data: usersData, error: usersError } = await supabase
+      .from("users")
+      .select("id")
+      .eq("auth_id", userData.user.id)
+      .single();
+
+    if (usersError || !usersData) {
+      return NextResponse.json(
+        { error: "User not found in database" },
+        { status: 404 }
+      );
+    }
+
+    // Fetch the job with the given job ID and user ID
+    const { data: job, error: jobError } = await supabase
+      .from("indexer_jobs")
+      .select("*")
+      .eq("id", jobId)
+      .eq("user_id", usersData.id)
+      .single();
+
+    if (jobError || !job) {
+      return NextResponse.json(
+        { error: "Job not found" },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json({ data: job });
+  } catch (error) {
+    console.error("Error in GET /api/jobs/[id]:", error);
+    return NextResponse.json(
+      { error: "An error occurred while fetching the job" },
       { status: 500 }
     );
   }
