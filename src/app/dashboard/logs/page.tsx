@@ -184,7 +184,7 @@ export default function JobLogs() {
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbPage>My Indexer Job Logs</BreadcrumbPage>
+              <BreadcrumbPage>My Job Logs</BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>

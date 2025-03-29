@@ -273,7 +273,8 @@ export default function MyJobs() {
                                         : "bg-red-100 text-red-800"
                                     }`}
                                   >
-                                    {job.status}
+                                    {job.status.charAt(0).toUpperCase() +
+                                      job.status.slice(1)}
                                   </span>
                                 </span>
                               </div>
