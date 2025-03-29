@@ -255,7 +255,7 @@ export default function JobLogs() {
 
               {jobs.length > 0 && (
                 <div className="border rounded-md overflow-hidden">
-                  <div className="grid grid-cols-4 gap-4 p-3 bg-muted/50 text-sm font-medium">
+                  <div className="grid grid-cols-5 gap-3 p-3 bg-muted/50 text-sm font-medium">
                     <div>Job ID</div>
                     <div>Job Name</div>
                     <div>Status</div>
@@ -266,7 +266,7 @@ export default function JobLogs() {
                     {jobs.slice(0, 5).map((job) => (
                       <div
                         key={job.id}
-                        className="grid grid-cols-4 gap-4 p-3 text-sm items-center"
+                        className="grid grid-cols-5 gap-3 p-3 text-sm items-center"
                       >
                         <div className="font-medium truncate">{job.id}</div>
                         <div className="font-medium truncate">{job.name}</div>

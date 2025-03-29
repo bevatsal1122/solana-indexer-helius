@@ -213,7 +213,9 @@ export default function MyJobs() {
               <TableBody>
                 {jobs.map((job) => (
                   <TableRow key={job.id}>
-                    <TableCell className="font-medium">{job.id}</TableCell>
+                    <TableCell className="font-medium min-w-[60px]">
+                      {job.id}
+                    </TableCell>
                     <TableCell className="font-medium">{job.name}</TableCell>
                     <TableCell>{job.type.toUpperCase()}</TableCell>
                     <TableCell>
