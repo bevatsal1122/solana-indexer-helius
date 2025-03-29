@@ -145,16 +145,16 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const backendUrl = process.env.BACKEND_URL;
-    if (!backendUrl) {
-      console.error("BACKEND_URL is not set in environment variables");
+    const serverUrl = process.env.SERVER_URL;
+    if (!serverUrl) {
+      console.error("SERVER_URL is not set in environment variables");
       return NextResponse.json(
-        { error: "Backend URL not configured" },
+        { error: "Server URL not configured" },
         { status: 500 }
       );
     }
 
-    const response = await fetch(backendUrl + "/jobs/create", {
+    const response = await fetch(serverUrl + "/jobs/create", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
