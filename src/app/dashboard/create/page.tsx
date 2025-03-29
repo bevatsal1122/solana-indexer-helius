@@ -35,6 +35,7 @@ import {
 } from "@/components/ui/breadcrumb";
 import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 const formSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -56,6 +57,7 @@ export default function CreateIndexerJob() {
   const { user, loading } = useAuth({ redirectTo: "/auth" });
   const { toast } = useToast();
   const router = useRouter();
+  const [isSubmitting, setIsSubmitting] = useState(false);
   console.log("user", user);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -70,6 +72,7 @@ export default function CreateIndexerJob() {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
+      setIsSubmitting(true);
       const token = await supabase.auth.getSession();
       console.log("token", token);
       // Convert form values to match API schema
@@ -110,6 +113,8 @@ export default function CreateIndexerJob() {
       toast({
         title: "Error creating indexer job",
       });
+    } finally {
+      setIsSubmitting(false);
     }
   }
 
@@ -153,7 +158,7 @@ export default function CreateIndexerJob() {
                           <FormItem>
                             <FormLabel>Name</FormLabel>
                             <FormControl>
-                              <Input placeholder="My Indexer" {...field} />
+                              <Input placeholder="NFT Price Tracker" {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -167,7 +172,7 @@ export default function CreateIndexerJob() {
                           <FormItem>
                             <FormLabel>Description</FormLabel>
                             <FormControl>
-                              <Input placeholder="Description of this indexer" {...field} />
+                              <Input placeholder="Indexes NFT price data from Solana marketplaces" {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -181,7 +186,7 @@ export default function CreateIndexerJob() {
                           <FormItem>
                             <FormLabel>Database Host</FormLabel>
                             <FormControl>
-                              <Input placeholder="localhost" {...field} />
+                              <Input placeholder="my-postgres.example.com" {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -195,7 +200,7 @@ export default function CreateIndexerJob() {
                           <FormItem>
                             <FormLabel>Database Port</FormLabel>
                             <FormControl>
-                              <Input {...field} />
+                              <Input placeholder="5432" {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -209,7 +214,7 @@ export default function CreateIndexerJob() {
                           <FormItem>
                             <FormLabel>Database Name</FormLabel>
                             <FormControl>
-                              <Input {...field} />
+                              <Input placeholder="solana_indexer" {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -223,7 +228,7 @@ export default function CreateIndexerJob() {
                           <FormItem>
                             <FormLabel>Database User</FormLabel>
                             <FormControl>
-                              <Input {...field} />
+                              <Input placeholder="postgres_user" {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -237,7 +242,7 @@ export default function CreateIndexerJob() {
                           <FormItem>
                             <FormLabel>Database Password</FormLabel>
                             <FormControl>
-                              <Input type="password" {...field} />
+                              <Input type="password" placeholder="••••••••" {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -282,8 +287,12 @@ export default function CreateIndexerJob() {
                         )}
                       />
 
-                      <Button type="submit" className="w-full h-12 text-lg">
-                        Start Indexing
+                      <Button 
+                        type="submit" 
+                        className="w-full h-12 text-lg"
+                        disabled={isSubmitting}
+                      >
+                        {isSubmitting ? "Creating Indexer..." : "Start Indexing"}
                       </Button>
                     </form>
                   </Form>
