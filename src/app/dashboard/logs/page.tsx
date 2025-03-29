@@ -331,7 +331,7 @@ export default function JobLogs() {
                         {job && (
                           <Link
                             href={`/dashboard/logs/${log.job_id}`}
-                            className="text-xs bg-primary/10 px-2 py-0.5 rounded hover:bg-primary/20 transition-colors"
+                            className="text-md bg-primary/10 px-2 py-0.5 rounded hover:bg-primary/20 transition-colors"
                           >
                             Job #{log.job_id}: {job.name}
                           </Link>
