@@ -204,7 +204,7 @@ export default function MyJobs() {
                   <TableHead>Database</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Created</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+                  <TableHead className="w-[120px]">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -219,12 +219,12 @@ export default function MyJobs() {
                       <span
                         className={`px-2 py-1 rounded-full text-xs ${
                           job.status === "starting"
-                            ? "bg-yellow-100 text-yellow-800"
+                            ? "bg-yellow-300 text-yellow-900"
                             : job.status === "running"
-                            ? "bg-green-100 text-green-800"
+                            ? "bg-green-300 text-green-900"
                             : job.status === "failed"
-                            ? "bg-red-100 text-red-800"
-                            : "bg-green-100 text-green-800"
+                            ? "bg-red-300 text-red-900"
+                            : "bg-blue-300 text-blue-900"
                         }`}
                       >
                         {job.status.charAt(0).toUpperCase() +
@@ -232,7 +232,7 @@ export default function MyJobs() {
                       </span>
                     </TableCell>
                     <TableCell>{formatDate(job.created_at)}</TableCell>
-                    <TableCell className="text-right">
+                    <TableCell className="text-right w-[120px]">
                       <div className="flex justify-end gap-2">
                         <Dialog>
                           <DialogTrigger asChild>

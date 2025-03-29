@@ -1,12 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 
+interface RouteContext {
+  params: {
+    id: string;
+  }
+}
+
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  context: RouteContext
 ) {
   try {
-    const jobId = parseInt(params.id, 10);
+    const jobId = parseInt(context.params.id, 10);
     const authToken = req.headers.get("Authorization")?.split(" ")[1];
 
     if (!authToken) {
