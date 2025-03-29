@@ -5,10 +5,10 @@ import Link from "next/link";
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-secondary">
+    <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-16">
         <div className="text-center mb-16">
-          <h1 className="text-4xl font-bold tracking-tight mb-4">
+          <h1 className="text-4xl font-bold tracking-tight mb-4 text-foreground">
             Blockchain Indexing Platform
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
@@ -18,7 +18,7 @@ export default function Home() {
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
-          <Card className="p-6 space-y-4">
+          <Card className="p-6 space-y-4 bg-card text-card-foreground">
             <div className="h-12 w-12 bg-primary/10 rounded-lg flex items-center justify-center">
               <Database className="h-6 w-6 text-primary" />
             </div>
@@ -28,7 +28,7 @@ export default function Home() {
             </p>
           </Card>
 
-          <Card className="p-6 space-y-4">
+          <Card className="p-6 space-y-4 bg-card text-card-foreground">
             <div className="h-12 w-12 bg-primary/10 rounded-lg flex items-center justify-center">
               <Gauge className="h-6 w-6 text-primary" />
             </div>
@@ -38,7 +38,7 @@ export default function Home() {
             </p>
           </Card>
 
-          <Card className="p-6 space-y-4">
+          <Card className="p-6 space-y-4 bg-card text-card-foreground">
             <div className="h-12 w-12 bg-primary/10 rounded-lg flex items-center justify-center">
               <Lock className="h-6 w-6 text-primary" />
             </div>

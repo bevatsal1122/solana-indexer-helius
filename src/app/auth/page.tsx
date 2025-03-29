@@ -67,12 +67,10 @@ export default function Auth() {
 
       toast({
         title: "Account created successfully, you can now sign in.",
-        theme: "light",
       });
     } catch (error: any) {
       toast({
         title: error.message,
-        theme: "light",
       });
     } finally {
       setLoading(false);
@@ -98,7 +96,6 @@ export default function Auth() {
     } catch (error: any) {
       toast({
         title: error.message,
-        theme: "light",
       });
     } finally {
       setLoading(false);
@@ -106,8 +103,8 @@ export default function Auth() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-background to-secondary p-4">
-      <Card className="w-full max-w-md p-8">
+    <div className="min-h-screen flex items-center justify-center bg-background p-4">
+      <Card className="w-full max-w-md p-8 bg-card text-card-foreground">
         <h2 className="text-2xl font-bold text-center mb-4">
           Solana Indexer | By bevatsal1122
         </h2>
@@ -119,7 +116,7 @@ export default function Auth() {
                 placeholder="Email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="h-10"
+                className="h-10 bg-input text-foreground"
               />
             </div>
             <div>
@@ -128,21 +125,21 @@ export default function Auth() {
                 placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="h-10"
+                className="h-10 bg-input text-foreground"
               />
             </div>
           </div>
 
           <div className="space-y-2">
             <Button
-              className="w-full h-10"
+              className="w-full h-10 bg-primary text-primary-foreground hover:bg-primary/90"
               onClick={handleSignIn}
               disabled={loading}
             >
               Sign In
             </Button>
             <Button
-              className="w-full h-10"
+              className="w-full h-10 border-primary hover:bg-accent hover:text-accent-foreground"
               variant="outline"
               onClick={handleSignUp}
               disabled={loading}

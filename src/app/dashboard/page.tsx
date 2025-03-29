@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Briefcase, Calendar, FileText, Award, Mail } from "lucide-react";
+import Link from "next/link";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -20,7 +21,7 @@ export default function StatsPage() {
   console.log("user", user);
 
   return (
-    <div className="flex gap-8 min-h-screen">
+    <div className="flex gap-8 min-h-screen bg-background">
       <div className="w-[250px] shrink-0">
         <Sidebar />
       </div>
@@ -41,7 +42,7 @@ export default function StatsPage() {
 
           <div className="grid grid-cols-2 gap-8 mb-10">
             {/* Live Jobs */}
-            <Card className="border shadow-sm">
+            <Card className="border border-border shadow-sm bg-card text-card-foreground">
               <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle className="text-xl font-medium">Live Jobs</CardTitle>
                 <Briefcase className="h-6 w-6 text-muted-foreground" />
@@ -55,7 +56,7 @@ export default function StatsPage() {
             </Card>
 
             {/* Recent Jobs */}
-            <Card className="border shadow-sm">
+            <Card className="border border-border shadow-sm bg-card text-card-foreground">
               <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle className="text-xl font-medium">
                   Recent Jobs
@@ -71,7 +72,7 @@ export default function StatsPage() {
             </Card>
 
             {/* Entries Processed */}
-            <Card className="border shadow-sm">
+            <Card className="border border-border shadow-sm bg-card text-card-foreground">
               <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle className="text-xl font-medium">
                   Entries Processed
@@ -87,7 +88,7 @@ export default function StatsPage() {
             </Card>
 
             {/* Top Job */}
-            <Card className="border shadow-sm">
+            <Card className="border border-border shadow-sm bg-card text-card-foreground">
               <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle className="text-xl font-medium">Top Job</CardTitle>
                 <Award className="h-6 w-6 text-muted-foreground" />
@@ -102,19 +103,25 @@ export default function StatsPage() {
           </div>
 
           {/* Action Buttons */}
-          <div className="flex gap-6 mb-10 justify-center">
-            <Button className="px-8 py-6 text-lg bg-primary text-primary-foreground hover:bg-primary/90">
-              <Briefcase className="mr-3 h-5 w-5" />
-              My Jobs
-            </Button>
-            <Button className="px-8 py-6 text-lg bg-primary text-primary-foreground hover:bg-primary/90">
-              <Calendar className="mr-3 h-5 w-5" />
-              Create Job
-            </Button>
-            <Button className="px-8 py-6 text-lg bg-secondary text-secondary-foreground hover:bg-secondary/90">
-              <FileText className="mr-3 h-5 w-5" />
-              Job Logs
-            </Button>
+          <div className="flex gap-6 mb-10 w-full">
+            <Link href="/dashboard/myjobs">
+              <Button className="flex-1 px-8 py-6 text-lg bg-primary text-primary-foreground hover:bg-primary/90">
+                <Briefcase className="mr-3 h-5 w-5" />
+                My Jobs
+              </Button>
+            </Link>
+            <Link href="/dashboard/create">
+              <Button className="flex-1 px-8 py-6 text-lg bg-primary text-primary-foreground hover:bg-primary/90">
+                <Calendar className="mr-3 h-5 w-5" />
+                Create Job
+              </Button>
+            </Link>
+            <Link href="/dashboard/logs">
+              <Button className="flex-1 px-8 py-6 text-lg bg-primary text-primary-foreground hover:bg-primary/90">
+                <FileText className="mr-3 h-5 w-5" />
+                Job Logs
+              </Button>
+            </Link>
           </div>
 
           {/* Contact Developer */}

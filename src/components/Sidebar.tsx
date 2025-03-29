@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { MenuIcon, X, LogOut, Activity, Plus, FileText } from "lucide-react";
+import { MenuIcon, X, LogOut, Activity, Plus, FileText, LayoutDashboard, Database } from "lucide-react";
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
@@ -55,12 +55,12 @@ export function Sidebar({ className }: SidebarProps) {
       {/* Sidebar */}
       <div
         className={cn(
-          "fixed left-0 top-0 z-40 h-full w-72 bg-background/95 backdrop-blur-sm border-r transition-all duration-300 ease-in-out shadow-lg",
+          "fixed left-0 top-0 z-40 h-full w-66 bg-sidebar border-sidebar-border transition-all duration-300 ease-in-out shadow-lg",
           !isOpen && "-translate-x-full",
           className
         )}
       >
-        <div className="flex flex-col h-full p-6">
+        <div className="flex flex-col h-full p-6 pl-4">
           <div className="space-y-16 flex-1">
             {/* Header with logo/brand */}
             <div className="flex items-center space-x-3 mt-6">
@@ -76,12 +76,12 @@ export function Sidebar({ className }: SidebarProps) {
                 <Button
                   variant="ghost"
                   className={cn(
-                    "w-full justify-start text-base rounded-xl transition-all duration-300 hover:bg-gradient-to-r hover:from-primary/5 hover:to-primary/10 hover:scale-[1.02] group",
+                    "w-full justify-start text-base rounded-xl transition-all duration-300 hover:bg-gradient-to-r hover:from-primary/5 hover:to-primary/10 hover:scale-[1.05] group",
                     pathname === "/dashboard" && "bg-gradient-to-r from-primary/5 to-primary/10 scale-[1.02]"
                   )}
                   size="lg"
                 >
-                  <Activity className="mr-3 h-5 w-5 group-hover:text-primary transition-colors" />
+                  <LayoutDashboard className="mr-3 h-5 w-5 group-hover:text-primary transition-colors" />
                   Dashboard
                 </Button>
               </Link>
@@ -89,12 +89,12 @@ export function Sidebar({ className }: SidebarProps) {
                 <Button
                   variant="ghost"
                   className={cn(
-                    "w-full justify-start text-base rounded-xl transition-all duration-300 hover:bg-gradient-to-r hover:from-primary/5 hover:to-primary/10 hover:scale-[1.02] group",
+                    "w-full justify-start text-base rounded-xl transition-all duration-300 hover:bg-gradient-to-r hover:from-primary/5 hover:to-primary/10 hover:scale-[1.05] group",
                     pathname === "/dashboard/myjobs" && "bg-gradient-to-r from-primary/5 to-primary/10 scale-[1.02]"
                   )}
                   size="lg"
                 >
-                  <Activity className="mr-3 h-5 w-5 group-hover:text-primary transition-colors" />
+                  <Database className="mr-3 h-5 w-5 group-hover:text-primary transition-colors" />
                   My Indexer Jobs
                 </Button>
               </Link>
@@ -103,13 +103,13 @@ export function Sidebar({ className }: SidebarProps) {
                 <Button
                   variant="ghost"
                   className={cn(
-                    "w-full justify-start text-base rounded-xl transition-all duration-300 hover:bg-gradient-to-r hover:from-primary/5 hover:to-primary/10 hover:scale-[1.02] group",
+                    "w-full justify-start text-base rounded-xl transition-all duration-300 hover:bg-gradient-to-r hover:from-primary/5 hover:to-primary/10 hover:scale-[1.05] group",
                     pathname === "/dashboard/create" && "bg-gradient-to-r from-primary/5 to-primary/10 scale-[1.02]"
                   )}
                   size="lg"
                 >
                   <Plus className="mr-3 h-5 w-5 group-hover:text-primary transition-colors" />
-                  Create Indexer Job
+                  Create New Job
                 </Button>
               </Link>
 
@@ -117,18 +117,18 @@ export function Sidebar({ className }: SidebarProps) {
                 <Button
                   variant="ghost"
                   className={cn(
-                    "w-full justify-start text-base rounded-xl transition-all duration-300 hover:bg-gradient-to-r hover:from-primary/5 hover:to-primary/10 hover:scale-[1.02] group",
+                    "w-full justify-start text-base rounded-xl transition-all duration-300 hover:bg-gradient-to-r hover:from-primary/5 hover:to-primary/10 hover:scale-[1.05] group",
                     pathname === "/dashboard/logs" && "bg-gradient-to-r from-primary/5 to-primary/10 scale-[1.02]"
                   )}
                   size="lg"
                 >
-                  <FileText className="mr-3 h-5 w-5 group-hover:text-primary transition-colors" />
-                  My Indexer Job Logs
+                  <FileText className="mr-3 h-5 w-5 group-hover:text-primary transition-colors"/>
+                  My Job Logs
                 </Button>
               </Link>
               <Button
                 variant="ghost"
-                className="w-full justify-start text-base rounded-xl transition-all duration-300 hover:bg-gradient-to-r hover:from-destructive/5 hover:to-destructive/10 hover:scale-[1.02] group"
+                className="w-full justify-start text-base rounded-xl transition-all duration-300 hover:bg-gradient-to-r hover:from-destructive/5 hover:to-destructive/10 hover:scale-[1.05] group"
                 size="lg"
                 onClick={handleLogout}
               >
@@ -140,11 +140,11 @@ export function Sidebar({ className }: SidebarProps) {
             </div>
           </div>
 
-          <div className="pt-4 border-t">
-            <span className="text-md text-black font-semibold">
+          {/* <div className="pt-4 border-t border-sidebar-border">
+            <span className="text-md text-sidebar-foreground font-semibold">
               Developed by bevatsal1122
             </span>
-          </div>
+          </div> */}
         </div>
       </div>
     </>

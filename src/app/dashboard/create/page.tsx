@@ -37,6 +37,8 @@ import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
+  name: z.string().min(1, "Name is required"),
+  description: z.string().min(1, "Description is required"),
   dbHost: z.string().min(1, "Database host is required"),
   dbPort: z.string().min(1, "Database port is required"),
   dbName: z.string().min(1, "Database name is required"),
@@ -61,6 +63,8 @@ export default function CreateIndexerJob() {
     defaultValues: {
       dbPort: "5432",
       indexingType: "nft_prices",
+      name: "",
+      description: "",
     },
   });
 
@@ -70,8 +74,8 @@ export default function CreateIndexerJob() {
       console.log("token", token);
       // Convert form values to match API schema
       const payload = {
-        name: `${values.indexingType}-indexer`,
-        description: `Indexer for ${values.indexingType}`,
+        name: values.name,
+        description: values.description,
         db_host: values.dbHost,
         db_port: values.dbPort,
         db_name: values.dbName,
@@ -96,9 +100,11 @@ export default function CreateIndexerJob() {
       }
 
       toast({
-        title: "Success! Indexing job created successfully",
+        title: "Success! Indexer Job created successfully",
       });
-      router.push("/dashboard");
+
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      router.push("/dashboard/myjobs");
     } catch (error: any) {
       console.error("Error creating indexer job:", error);
       toast({
@@ -128,11 +134,11 @@ export default function CreateIndexerJob() {
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
-        <div className="container pb-10 mt-2 bg-background text-foreground max-w-6xl">
+        <div className="container pb-10 mt-2  max-w-6xl">
           <h1 className="text-4xl font-bold mb-10">Create Indexer Job</h1>
 
-          <div className="flex-1 p-8">
-            <div className="max-w-4xl mx-auto">
+          <div className="flex-1 p-2">
+            <div className="max-w-5xl mx-auto">
               <div className="space-y-8">
                 <Card className="p-6">
                   <Form {...form}>
@@ -140,6 +146,34 @@ export default function CreateIndexerJob() {
                       onSubmit={form.handleSubmit(onSubmit)}
                       className="space-y-6"
                     >
+                      <FormField
+                        control={form.control}
+                        name="name"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Name</FormLabel>
+                            <FormControl>
+                              <Input placeholder="My Indexer" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="description"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Description</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Description of this indexer" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
                       <FormField
                         control={form.control}
                         name="dbHost"
