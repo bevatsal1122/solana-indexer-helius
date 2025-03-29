@@ -145,6 +145,33 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const backendUrl = process.env.BACKEND_URL;
+    if (!backendUrl) {
+      console.error("BACKEND_URL is not set in environment variables");
+      return NextResponse.json(
+        { error: "Backend URL not configured" },
+        { status: 500 }
+      );
+    }
+
+    const response = await fetch(backendUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ jobId: data.id }),
+    });
+
+    console.log("Response:", response);
+
+    if (!response.ok) {
+      console.error("Failed to send job to backend:", response.statusText);
+      return NextResponse.json(
+        { error: "Failed to process job" },
+        { status: 500 }
+      );
+    }
+
     return NextResponse.json({ success: true, data }, { status: 201 });
   } catch (error) {
     console.error("Unexpected error:", error);
