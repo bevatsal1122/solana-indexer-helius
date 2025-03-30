@@ -28,7 +28,7 @@ export default function Home() {
               Scalable & Reliable
             </span>
           </div>
-          <h1 className="text-5xl md:text-6xl font-bold tracking-tight mb-4 text-foreground bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/70">
+          <h1 className="text-5xl md:text-6xl font-bold tracking-tight mb-4 text-foreground bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/70 min-h-16">
             Solana Indexing Platform
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
