@@ -129,13 +129,16 @@ export default function JobLogs() {
       const data = await response.json();
 
       if (response.ok && data.data) {
-        // Find new log IDs by comparing with the current logs
-        const currentLogIds = new Set(logs.map(log => log.id));
-        const newLogs = data.data.filter((log: LogEntry) => !currentLogIds.has(log.id));
-        
-        // Update newLogIds with IDs of newly fetched logs
-        if (newLogs.length > 0) {
-          setNewLogIds(newLogs.map((log: LogEntry) => log.id));
+        // Only check for new logs if we already have logs loaded
+        if (logs.length > 0) {
+          // Find new log IDs by comparing with the current logs
+          const currentLogIds = new Set(logs.map(log => log.id));
+          const newLogs = data.data.filter((log: LogEntry) => !currentLogIds.has(log.id));
+          
+          // Only update newLogIds if there are actually new logs
+          if (newLogs.length > 0) {
+            setNewLogIds(newLogs.map((log: LogEntry) => log.id));
+          }
         }
         
         // Update logs state
@@ -163,6 +166,7 @@ export default function JobLogs() {
         setIsLoading(false)
       );
 
+      // Set up interval for periodic updates
       const intervalId = setInterval(() => {
         Promise.all([fetchJobs(), fetchLogs()]);
       }, 3000);
