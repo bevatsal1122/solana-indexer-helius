@@ -9,6 +9,8 @@ import { useToast } from "@/hooks/use-toast";
 import { signUpUser, signInUser, getUserByToken } from "@/lib/supabase";
 import { supabase } from "@/lib/supabase";
 import { setAuthCookie, getAuthCookie } from "@/lib/cookies";
+import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 
 export default function Auth() {
   const [email, setEmail] = useState("");
@@ -103,6 +105,14 @@ export default function Auth() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
+      <div className="absolute top-4 left-4 md:top-8 md:left-8">
+        <Button variant="ghost" size="icon" asChild className="rounded-full h-10 w-10 bg-card/50 backdrop-blur-sm hover:bg-primary/5 transition-colors">
+          <Link href="/" aria-label="Back to home">
+            <ArrowLeft className="h-5 w-5 text-foreground" />
+          </Link>
+        </Button>
+      </div>
+      
       <Card className="w-full max-w-md p-8 bg-card text-card-foreground">
         <h2 className="text-2xl font-bold text-center mb-4">
           Solana Indexer | By bevatsal1122
