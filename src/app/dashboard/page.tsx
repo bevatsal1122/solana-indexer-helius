@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/breadcrumb";
 import { Sidebar } from "@/components/Sidebar";
 import { useAuth } from "@/lib/useAuth";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { supabase } from "@/lib/supabase";
 
 interface JobMetrics {
@@ -27,6 +27,54 @@ interface JobMetrics {
     type?: string;
   } | null;
   recent_jobs_count: number;
+}
+
+// Animation component for numbers
+function AnimatedCounter({ value, isLoading }: { value: number, isLoading: boolean }) {
+  const [displayValue, setDisplayValue] = useState(0);
+  const animationRef = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    if (isLoading || value === undefined || value === null) return;
+    
+    // Clear any existing animation
+    if (animationRef.current) {
+      clearTimeout(animationRef.current);
+    }
+    
+    const startValue = 0;
+    const endValue = value;
+    const duration = 2000; // 2 seconds
+    const frameDuration = 20; // 50 fps
+    const totalFrames = duration / frameDuration;
+    let currentFrame = 0;
+
+    // Animation step function
+    const animate = () => {
+      currentFrame++;
+      // Easing function for smooth animation
+      const progress = currentFrame / totalFrames;
+      const currentValue = Math.round(startValue + (endValue - startValue) * progress);
+      
+      setDisplayValue(currentValue);
+      
+      if (currentFrame < totalFrames) {
+        animationRef.current = setTimeout(animate, frameDuration);
+      } else {
+        setDisplayValue(endValue);
+      }
+    };
+    
+    animate();
+    
+    return () => {
+      if (animationRef.current) {
+        clearTimeout(animationRef.current);
+      }
+    };
+  }, [value, isLoading]);
+
+  return isLoading ? "..." : displayValue.toLocaleString();
 }
 
 export default function StatsPage() {
@@ -117,7 +165,7 @@ export default function StatsPage() {
               </CardHeader>
               <CardContent className="mb-1">
                 <div className="text-4xl font-bold">
-                  {isLoading ? "..." : metrics?.running_jobs_count || 0}
+                  <AnimatedCounter value={metrics?.running_jobs_count || 0} isLoading={isLoading} />
                 </div>
                 <p className="text-sm text-muted-foreground mt-2">
                   Active jobs in the system
@@ -135,7 +183,7 @@ export default function StatsPage() {
               </CardHeader>
               <CardContent className="mb-1">
                 <div className="text-4xl font-bold">
-                  {isLoading ? "..." : metrics?.recent_jobs_count || 0}
+                  <AnimatedCounter value={metrics?.recent_jobs_count || 0} isLoading={isLoading} />
                 </div>
                 <p className="text-sm text-muted-foreground mt-2">
                   Created in the last 30 days
@@ -153,10 +201,12 @@ export default function StatsPage() {
               </CardHeader>
               <CardContent className="mb-1">
                 <div className="text-4xl font-bold">
-                  {isLoading ? "..." : 
-                   (metrics?.total_entries_processed !== undefined && 
-                    metrics?.total_entries_processed !== null) ? 
-                     metrics.total_entries_processed.toLocaleString() : "0"}
+                  <AnimatedCounter 
+                    value={metrics?.total_entries_processed !== undefined && 
+                           metrics?.total_entries_processed !== null ? 
+                           metrics.total_entries_processed : 0} 
+                    isLoading={isLoading} 
+                  />
                 </div>
                 <p className="text-sm text-muted-foreground mt-2">
                   Total entries processed by running jobs
@@ -176,7 +226,7 @@ export default function StatsPage() {
                 </div>
                 <p className="text-sm text-muted-foreground mt-2">
                   {metrics?.max_entries_job ? 
-                    `Processed ${metrics.max_entries_job.entries_processed.toLocaleString()} entries` : 
+                    <span>Processed <AnimatedCounter value={metrics.max_entries_job.entries_processed} isLoading={isLoading} /> entries</span> : 
                     "Create your first job to see stats"}
                 </p>
               </CardContent>
