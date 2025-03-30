@@ -112,9 +112,9 @@ export default function Home() {
             <div className="h-14 w-14 bg-primary/10 rounded-2xl flex items-center justify-center group-hover:bg-primary/20 transition-colors">
               <Code className="h-7 w-7 text-primary" />
             </div>
-            <h3 className="text-2xl font-semibold">Developer Friendly</h3>
+            <h3 className="text-2xl font-semibold">Infinite Scalability</h3>
             <p className="text-muted-foreground leading-relaxed">
-              Simple API, comprehensive documentation, and ready-to-use SQL queries to jumpstart your development.
+              Automatically scale with your application's growth - handle millions of transactions without performance degradation or added complexity.
             </p>
           </Card>
         </div>
