@@ -114,7 +114,7 @@ export default function Home() {
             </div>
             <h3 className="text-2xl font-semibold">Infinite Scalability</h3>
             <p className="text-muted-foreground leading-relaxed">
-              Automatically scale with your application's growth - handle millions of transactions without performance degradation or added complexity.
+              Automatically scale with your application&apos;s growth - handle millions of transactions without performance degradation or added complexity.
             </p>
           </Card>
         </div>
