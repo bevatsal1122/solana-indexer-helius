@@ -1,17 +1,16 @@
 /* Animation styles for logs */
 
-/* New log entry animation */
+/* New log entry animation - simple slide in from left */
 .new-log {
-  animation: slideIn 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation: simpleSlideIn 0.5s ease-out forwards;
   position: relative;
   z-index: 5;
-  transform-origin: left center;
 }
 
-@keyframes slideIn {
+@keyframes simpleSlideIn {
   0% {
     opacity: 0;
-    transform: translateX(-100%);
+    transform: translateX(-20px);
   }
   100% {
     opacity: 1;
@@ -19,27 +18,24 @@
   }
 }
 
-/* Existing logs movement when new log is added */
+/* Existing logs movement - simple slide down */
 .logs-container.new-logs-added .log-item:not(.new-log) {
-  animation: slideDown 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  animation: simpleSlideDown 0.4s ease-out;
 }
 
-@keyframes slideDown {
+@keyframes simpleSlideDown {
   0% {
     transform: translateY(0);
   }
-  20% {
-    transform: translateY(0);
-  }
-  60% {
-    transform: translateY(20px);
+  50% {
+    transform: translateY(10px);
   }
   100% {
     transform: translateY(0);
   }
 }
 
-/* Staged animation - first item moves down first, then the next ones */
+/* Simple sequential animation delay */
 .logs-container.new-logs-added .log-item:not(.new-log):nth-child(1) {
   animation-delay: 0s;
 }
@@ -49,17 +45,12 @@
 .logs-container.new-logs-added .log-item:not(.new-log):nth-child(3) {
   animation-delay: 0.1s;
 }
-.logs-container.new-logs-added .log-item:not(.new-log):nth-child(4) {
-  animation-delay: 0.15s;
-}
-.logs-container.new-logs-added .log-item:not(.new-log):nth-child(5) {
-  animation-delay: 0.2s;
-}
 
 /* Hover effect for log items */
 .log-item {
   transition: background-color 0.2s ease-out, box-shadow 0.2s ease-out;
   will-change: transform, opacity;
+  position: relative;
 }
 
 .log-item:hover {

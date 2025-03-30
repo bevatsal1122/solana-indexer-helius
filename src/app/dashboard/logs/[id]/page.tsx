@@ -113,13 +113,17 @@ export default function JobDetailLogs() {
       const data = await response.json();
       
       if (response.ok && data.data) {
+        // Check if this is initial load or a refresh
+        const isInitialLoad = logs.length === 0;
+        
         // Find new log IDs by comparing with the current logs
         const currentLogIds = new Set(logs.map(log => log.id));
         const newLogs = data.data.filter((log: LogEntry) => !currentLogIds.has(log.id));
         
-        // Update newLogIds with IDs of newly fetched logs
-        if (newLogs.length > 0) {
+        // Only update newLogIds if there are actually new logs AND it's not the initial load
+        if (newLogs.length > 0 && !isInitialLoad) {
           setNewLogIds(newLogs.map((log: LogEntry) => log.id));
+          console.log(`Found ${newLogs.length} new logs for job #${jobId}`);
         }
         
         setLogs(data.data);

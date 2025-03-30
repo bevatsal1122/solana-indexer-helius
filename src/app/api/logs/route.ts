@@ -102,7 +102,6 @@ export async function GET(req: NextRequest) {
       )
       .in("job_id", jobIdsQuery)
       .order("created_at", { ascending: false })
-      .limit(200);
 
     if (logsError) {
       console.error("Error fetching logs:", logsError);
