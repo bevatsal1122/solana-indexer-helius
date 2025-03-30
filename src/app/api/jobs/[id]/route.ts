@@ -30,7 +30,6 @@ export async function DELETE(
       );
     }
 
-    // Get user ID from users table using auth_id
     const { data: usersData, error: usersError } = await supabase
       .from("users")
       .select("id")
@@ -43,8 +42,6 @@ export async function DELETE(
         { status: 404 }
       );
     }
-
-    // Check if the job exists and belongs to the user
     const { data: job, error: jobError } = await supabase
       .from("indexer_jobs")
       .select("*")
@@ -59,7 +56,6 @@ export async function DELETE(
       );
     }
 
-    // First delete all logs associated with the job
     const { error: logsDeleteError } = await supabase
       .from("logs")
       .delete()
@@ -72,8 +68,24 @@ export async function DELETE(
         { status: 500 }
       );
     }
+   
+    try {
+      const SERVER_URL = process.env.SERVER_URL!;
+      const response = await fetch(`${SERVER_URL}/jobs/${jobId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': request.headers.get('Authorization') || '',
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (!response.ok) {
+        console.error(`Error deleting job on server: ${response.status} ${response.statusText}`);
+      }
+    } catch (serverError) {
+      console.error("Error connecting to server:", serverError);
+    }
 
-    // Delete the job
     const { error: deleteError } = await supabase
       .from("indexer_jobs")
       .delete()
