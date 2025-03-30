@@ -200,7 +200,7 @@ export default function MyJobs() {
               </TableCaption>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="min-w-[60px]">Job ID</TableHead>
+                  <TableHead className="min-w-[80px]">Job ID</TableHead>
                   <TableHead>Job Name</TableHead>
                   <TableHead>Job Type</TableHead>
                   <TableHead>DB Info</TableHead>
