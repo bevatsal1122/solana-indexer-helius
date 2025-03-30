@@ -17,6 +17,13 @@ import { useToast } from "@/hooks/use-toast";
 import { Loader2, AlertCircle, CheckCircle2, Eye, EyeOff } from "lucide-react";
 import { useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 type Job = {
   id: number;
@@ -42,12 +49,15 @@ export default function JobDetailLogs() {
   const { user, loading: authLoading } = useAuth({ redirectTo: "/auth" });
   const [job, setJob] = useState<Job | null>(null);
   const [logs, setLogs] = useState<LogEntry[]>([]);
+  const [filteredLogs, setFilteredLogs] = useState<LogEntry[]>([]);
+  const [logTagFilter, setLogTagFilter] = useState<string>("all");
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
   const params = useParams();
   const jobId = params.id as string;
   const [showPassword, setShowPassword] = useState(false);
   const passwordTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const [newLogIds, setNewLogIds] = useState<number[]>([]);
 
   const fetchJob = async () => {
     try {
@@ -102,6 +112,15 @@ export default function JobDetailLogs() {
       const data = await response.json();
       
       if (response.ok && data.data) {
+        // Find new log IDs by comparing with the current logs
+        const currentLogIds = new Set(logs.map(log => log.id));
+        const newLogs = data.data.filter((log: LogEntry) => !currentLogIds.has(log.id));
+        
+        // Update newLogIds with IDs of newly fetched logs
+        if (newLogs.length > 0) {
+          setNewLogIds(newLogs.map((log: LogEntry) => log.id));
+        }
+        
         setLogs(data.data);
       } else {
         console.error("Failed to fetch logs:", data.error);
@@ -135,6 +154,18 @@ export default function JobDetailLogs() {
     }
   }, [user, authLoading, jobId]);
 
+  // Filter logs when log tag filter or logs change
+  useEffect(() => {
+    if (logTagFilter === "all") {
+      setFilteredLogs(logs);
+    } else {
+      setFilteredLogs(logs.filter(log => {
+        const tagLower = log.tag?.toLowerCase() || "";
+        return tagLower.includes(logTagFilter.toLowerCase());
+      }));
+    }
+  }, [logs, logTagFilter]);
+
   const revealPassword = () => {
     setShowPassword(true);
     
@@ -158,6 +189,28 @@ export default function JobDetailLogs() {
     };
   }, []);
 
+  // Effect to animate existing logs down when new logs are added
+  useEffect(() => {
+    if (newLogIds.length > 0) {
+      // Get all log elements that are not new
+      const existingLogElements = document.querySelectorAll('.log-item:not(.new-log)');
+      
+      // Animate existing logs to slide down
+      existingLogElements.forEach((el) => {
+        const element = el as HTMLElement;
+        // First apply the transform to move up
+        element.style.transform = 'translateY(-20px)';
+        element.style.opacity = '0.7';
+        
+        // Then animate back to normal position
+        setTimeout(() => {
+          element.style.transform = 'translateY(0)';
+          element.style.opacity = '1';
+        }, 50);
+      });
+    }
+  }, [newLogIds]);
+
   const formatDate = (dateString: string) => {
     try {
       return formatDistanceToNow(new Date(dateString), { addSuffix: true });
@@ -173,6 +226,25 @@ export default function JobDetailLogs() {
     if (tagLower.includes('warn')) return "text-yellow-600";
     if (tagLower.includes('info')) return "text-green-600";
     return "text-blue-600";
+  };
+  
+  // Add animation styles
+  const logContainerStyles = {
+    overflow: 'hidden',
+    position: 'relative' as const,
+  };
+
+  const logItemStyles = {
+    transition: 'all 0.5s ease-out',
+    transform: 'translateY(0)',
+    opacity: 1,
+  };
+
+  const newLogStyles = {
+    transform: 'translateX(-100%)', // Slide in from left
+    opacity: 0,
+    zIndex: 10,
+    position: 'relative' as const,
   };
 
   return (
@@ -288,33 +360,79 @@ export default function JobDetailLogs() {
             </div>
           )}
 
-          <h2 className="text-2xl font-semibold mb-4">Logs</h2>
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-2xl font-semibold">Logs</h2>
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-muted-foreground">Filter by:</span>
+              <Select value={logTagFilter} onValueChange={setLogTagFilter}>
+                <SelectTrigger className="w-[130px]">
+                  <SelectValue placeholder="All Logs" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Logs</SelectItem>
+                  <SelectItem value="info">Info</SelectItem>
+                  <SelectItem value="warn">Warning</SelectItem>
+                  <SelectItem value="error">Error</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
           
           {isLoading ? (
             <div className="flex justify-center p-12">
               <Loader2 className="h-8 w-8 animate-spin text-primary" />
             </div>
-          ) : logs.length === 0 ? (
+          ) : filteredLogs.length === 0 ? (
             <div className="text-center py-10">
-              <p className="text-muted-foreground">No logs found for this job.</p>
+              <p className="text-muted-foreground">
+                {logs.length === 0 ? "No logs found for this job." : "No logs match the selected filter."}
+              </p>
             </div>
           ) : (
-            <div className="space-y-4">
-              {logs.map((log) => (
-                <div key={log.id} className="border rounded-lg p-4 hover:bg-accent/50 transition-colors">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="font-mono text-xs text-muted-foreground">
-                      {formatDate(log.created_at)}
-                    </span>
-                    {log.tag && (
-                      <span className={`text-xs font-medium px-2 py-1 rounded ${getLogLevelStyle(log.tag)}`}>
-                        {log.tag}
+            <div className="space-y-4" style={logContainerStyles}>
+              {filteredLogs.map((log) => {
+                const isNew = newLogIds.includes(log.id);
+                
+                return (
+                  <div 
+                    key={log.id} 
+                    className={`border rounded-lg p-4 hover:bg-accent/50 transition-colors log-item ${isNew ? 'new-log' : ''}`}
+                    style={{
+                      ...logItemStyles,
+                      ...(isNew ? newLogStyles : {})
+                    }}
+                    ref={el => {
+                      if (isNew && el) {
+                        // Use requestAnimationFrame to ensure the DOM has been updated
+                        requestAnimationFrame(() => {
+                          // Trigger the animation
+                          requestAnimationFrame(() => {
+                            el.style.transform = 'translateX(0)';
+                            el.style.opacity = '1';
+                          });
+                        });
+                        
+                        // Remove from newLogIds after animation completes
+                        setTimeout(() => {
+                          setNewLogIds(prev => prev.filter(id => id !== log.id));
+                        }, 500); // Match transition duration
+                      }
+                    }}
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="font-mono text-xs text-muted-foreground">
+                        {formatDate(log.created_at)}
                       </span>
-                    )}
+                      {log.tag && (
+                        <span className={`text-xs font-medium px-2 py-1 rounded ${getLogLevelStyle(log.tag)}`}>
+                          {log.tag}
+                        </span>
+                      )}
+                    </div>
+                    <p className={`text-sm ${getLogLevelStyle(log.tag)}`}>{log.message}</p>
                   </div>
-                  <p className={`text-sm ${getLogLevelStyle(log.tag)}`}>{log.message}</p>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>
