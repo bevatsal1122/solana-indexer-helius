@@ -46,10 +46,10 @@ const formSchema = z.object({
   dbUser: z.string().min(1, "Database user is required"),
   dbPassword: z.string().min(1, "Database password is required"),
   indexingType: z.enum([
-    "nft_bids",
-    "nft_prices",
-    "token_prices",
-    "token_borrowing",
+    "COMPRESSED_NFT_MINT",
+    "NFT_LISTING",
+    "NFT_MINT",
+    "NFT_SALE",
   ]),
 });
 
@@ -64,7 +64,7 @@ export default function CreateIndexerJob() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       dbPort: "5432",
-      indexingType: "nft_prices",
+      // indexingType: "NFT_MINT",
       name: "",
       description: "",
     },
@@ -158,7 +158,10 @@ export default function CreateIndexerJob() {
                           <FormItem>
                             <FormLabel>Name</FormLabel>
                             <FormControl>
-                              <Input placeholder="NFT Price Tracker" {...field} />
+                              <Input
+                                placeholder="NFT Price Tracker"
+                                {...field}
+                              />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -172,7 +175,10 @@ export default function CreateIndexerJob() {
                           <FormItem>
                             <FormLabel>Description</FormLabel>
                             <FormControl>
-                              <Input placeholder="Indexes NFT price data from Solana marketplaces" {...field} />
+                              <Input
+                                placeholder="Indexes NFT price data from Solana marketplaces"
+                                {...field}
+                              />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -186,7 +192,10 @@ export default function CreateIndexerJob() {
                           <FormItem>
                             <FormLabel>Database Host</FormLabel>
                             <FormControl>
-                              <Input placeholder="my-postgres.example.com" {...field} />
+                              <Input
+                                placeholder="my-postgres.example.com"
+                                {...field}
+                              />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -242,7 +251,11 @@ export default function CreateIndexerJob() {
                           <FormItem>
                             <FormLabel>Database Password</FormLabel>
                             <FormControl>
-                              <Input type="password" placeholder="••••••••" {...field} />
+                              <Input
+                                type="password"
+                                placeholder="••••••••"
+                                {...field}
+                              />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -265,17 +278,17 @@ export default function CreateIndexerJob() {
                                 </SelectTrigger>
                               </FormControl>
                               <SelectContent>
-                                <SelectItem value="nft_bids">
-                                  Current NFT Bids
+                                <SelectItem value="NFT_MINT">
+                                  NFT Mints
                                 </SelectItem>
-                                <SelectItem value="nft_prices">
-                                  NFT Prices
+                                <SelectItem value="COMPRESSED_NFT_MINT">
+                                  Compressed NFT Mints
                                 </SelectItem>
-                                <SelectItem value="token_prices">
-                                  Token Prices
+                                <SelectItem value="NFT_LISTING">
+                                  NFT Listings
                                 </SelectItem>
-                                <SelectItem value="token_borrowing">
-                                  Available Tokens to Borrow
+                                <SelectItem value="NFT_SALE">
+                                  NFT Sales
                                 </SelectItem>
                               </SelectContent>
                             </Select>
@@ -287,12 +300,14 @@ export default function CreateIndexerJob() {
                         )}
                       />
 
-                      <Button 
-                        type="submit" 
+                      <Button
+                        type="submit"
                         className="w-full h-12 text-lg"
                         disabled={isSubmitting}
                       >
-                        {isSubmitting ? "Creating Indexer..." : "Start Indexing"}
+                        {isSubmitting
+                          ? "Creating Indexer..."
+                          : "Start Indexing"}
                       </Button>
                     </form>
                   </Form>

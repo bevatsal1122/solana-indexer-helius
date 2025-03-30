@@ -217,7 +217,7 @@ export default function MyJobs() {
                       {job.id}
                     </TableCell>
                     <TableCell className="font-medium">{job.name}</TableCell>
-                    <TableCell>{job.type.toUpperCase()}</TableCell>
+                    <TableCell>{job.type}</TableCell>
                     <TableCell>
                       {job.db_host}/{job.db_name}
                     </TableCell>

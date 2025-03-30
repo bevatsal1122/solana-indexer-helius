@@ -40,34 +40,31 @@ export async function GET(req: NextRequest) {
 
     // Check if a specific job ID is requested
     const url = new URL(req.url);
-    const jobId = url.searchParams.get('jobId');
-    
+    const jobId = url.searchParams.get("jobId");
+
     // Get all jobs for this user
     let jobIdsQuery;
     if (jobId) {
       // If specific job ID is requested, validate that it belongs to the user
       const jobIdNum = parseInt(jobId);
       if (isNaN(jobIdNum)) {
-        return NextResponse.json(
-          { error: "Invalid job ID" },
-          { status: 400 }
-        );
+        return NextResponse.json({ error: "Invalid job ID" }, { status: 400 });
       }
-      
+
       const { data: job, error: jobError } = await supabase
         .from("indexer_jobs")
         .select("id")
         .eq("id", jobIdNum)
         .eq("user_id", usersData.id)
         .single();
-        
+
       if (jobError || !job) {
         return NextResponse.json(
           { error: "Job not found or access denied" },
           { status: 404 }
         );
       }
-      
+
       jobIdsQuery = [jobIdNum];
     } else {
       // Get all jobs for this user
@@ -87,7 +84,7 @@ export async function GET(req: NextRequest) {
       if (!jobs || jobs.length === 0) {
         return NextResponse.json({ data: [] }, { status: 200 });
       }
-      
+
       // Extract job IDs
       jobIdsQuery = jobs.map((job) => job.id);
     }
@@ -95,7 +92,14 @@ export async function GET(req: NextRequest) {
     // Get logs for these jobs
     const { data: logs, error: logsError } = await supabase
       .from("logs")
-      .select("*")
+      .select(
+        `
+        *,
+        indexer_jobs (
+          type
+        )
+      `
+      )
       .in("job_id", jobIdsQuery)
       .order("created_at", { ascending: false })
       .limit(200);

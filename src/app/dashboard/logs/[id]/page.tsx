@@ -308,7 +308,7 @@ export default function JobDetailLogs() {
                     </span>
                     {log.tag && (
                       <span className={`text-xs font-medium px-2 py-1 rounded ${getLogLevelStyle(log.tag)}`}>
-                        {log.tag.toUpperCase()}
+                        {log.tag}
                       </span>
                     )}
                   </div>

@@ -50,6 +50,9 @@ type LogEntry = {
   message: string;
   tag: string;
   created_at: string;
+  indexer_jobs: {
+    type: string;
+  };
 };
 
 export default function JobLogs() {
@@ -329,12 +332,17 @@ export default function JobLogs() {
                           {formatDate(log.created_at)}
                         </span>
                         {job && (
+                          <div className="flex items-center gap-2">
                           <Link
                             href={`/dashboard/logs/${log.job_id}`}
                             className="text-sm bg-primary/10 px-2 py-0.5 rounded hover:bg-primary/20 transition-colors"
                           >
                             Job #{log.job_id}: {job.name}
                           </Link>
+                          <span className="text-sm bg-primary/10 px-2 py-0.5 rounded hover:bg-primary/20 transition-colors">
+                            {log.indexer_jobs.type}
+                          </span>
+                          </div>
                         )}
                       </div>
                       {log.tag && (
@@ -343,7 +351,7 @@ export default function JobLogs() {
                             log.tag
                           )}`}
                         >
-                          {log.tag.toUpperCase()}
+                          {log.tag}
                         </span>
                       )}
                     </div>
