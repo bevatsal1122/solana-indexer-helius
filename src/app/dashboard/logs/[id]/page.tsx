@@ -24,6 +24,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import "../logs.css"; // Import CSS file for animations
 
 type Job = {
   id: number;
@@ -191,24 +192,27 @@ export default function JobDetailLogs() {
 
   // Effect to animate existing logs down when new logs are added
   useEffect(() => {
-    if (newLogIds.length > 0) {
-      // Get all log elements that are not new
-      const existingLogElements = document.querySelectorAll('.log-item:not(.new-log)');
-      
-      // Animate existing logs to slide down
-      existingLogElements.forEach((el) => {
-        const element = el as HTMLElement;
-        // First apply the transform to move up
-        element.style.transform = 'translateY(-20px)';
-        element.style.opacity = '0.7';
-        
-        // Then animate back to normal position
-        setTimeout(() => {
-          element.style.transform = 'translateY(0)';
-          element.style.opacity = '1';
-        }, 50);
-      });
-    }
+    if (newLogIds.length === 0) return;
+    
+    // Simply add a class to the container to trigger CSS animations
+    const container = document.querySelector('.logs-container');
+    if (!container) return;
+    
+    // Remove and add class to restart animation
+    container.classList.remove('new-logs-added');
+    
+    // Force reflow
+    void (container as HTMLElement).offsetHeight;
+    
+    // Add animation class
+    container.classList.add('new-logs-added');
+    
+    // Remove animation class after animation completes
+    setTimeout(() => {
+      container.classList.remove('new-logs-added');
+      // Clear newLogIds after animation is complete
+      setNewLogIds([]);
+    }, 800); // Increased to account for staggered animations
   }, [newLogIds]);
 
   const formatDate = (dateString: string) => {
@@ -227,23 +231,10 @@ export default function JobDetailLogs() {
     if (tagLower.includes('info')) return "text-green-600";
     return "text-blue-600";
   };
-  
-  // Add animation styles
+
+  // Animation container style
   const logContainerStyles = {
     overflow: 'hidden',
-    position: 'relative' as const,
-  };
-
-  const logItemStyles = {
-    transition: 'all 0.5s ease-out',
-    transform: 'translateY(0)',
-    opacity: 1,
-  };
-
-  const newLogStyles = {
-    transform: 'translateX(-100%)', // Slide in from left
-    opacity: 0,
-    zIndex: 10,
     position: 'relative' as const,
   };
 
@@ -389,35 +380,14 @@ export default function JobDetailLogs() {
               </p>
             </div>
           ) : (
-            <div className="space-y-4" style={logContainerStyles}>
+            <div className="space-y-4 logs-container" style={logContainerStyles}>
               {filteredLogs.map((log) => {
                 const isNew = newLogIds.includes(log.id);
                 
                 return (
                   <div 
                     key={log.id} 
-                    className={`border rounded-lg p-4 hover:bg-accent/50 transition-colors log-item ${isNew ? 'new-log' : ''}`}
-                    style={{
-                      ...logItemStyles,
-                      ...(isNew ? newLogStyles : {})
-                    }}
-                    ref={el => {
-                      if (isNew && el) {
-                        // Use requestAnimationFrame to ensure the DOM has been updated
-                        requestAnimationFrame(() => {
-                          // Trigger the animation
-                          requestAnimationFrame(() => {
-                            el.style.transform = 'translateX(0)';
-                            el.style.opacity = '1';
-                          });
-                        });
-                        
-                        // Remove from newLogIds after animation completes
-                        setTimeout(() => {
-                          setNewLogIds(prev => prev.filter(id => id !== log.id));
-                        }, 500); // Match transition duration
-                      }
-                    }}
+                    className={`border rounded-lg p-4 hover:bg-accent/50 log-item ${isNew ? 'new-log' : ''}`}
                   >
                     <div className="flex items-center justify-between mb-2">
                       <span className="font-mono text-xs text-muted-foreground">
